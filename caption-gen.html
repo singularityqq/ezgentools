@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Caption Generator - แคปชั่นเด็ด โพสต์ปุ๊บ ไลค์ปั๊บ</title>
+    <meta name="description" content="รวมแคปชั่นเด็ดๆ แคปชั่นอ่อย คำคมคนทำงาน สุ่มแคปชั่นฟรี เอาไปโพสต์เฟสบุ๊ค ไอจี ได้เลย">
+    <style>
+        /* CSS Theme เดิม */
+        :root { --primary: #e11d48; /* สีชมพูแดงๆ ให้ดูแซ่บ */ --dark: #0f172a; --light: #f8fafc; --accent: #fb7185; --card: #1e293b; }
+        body { margin: 0; font-family: 'Sarabun', 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); }
+        
+        /* Navbar */
+        .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
+        .logo span { color: #3b82f6; } /* สีฟ้าเดิม */
+        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; font-weight: 500; }
+
+        /* Container */
+        .container { max-width: 700px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(to right, #e11d48, #fb7185); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Controls */
+        .category-select { padding: 15px; border-radius: 8px; background: #1e293b; color: white; border: 1px solid #475569; font-size: 1.1rem; margin-bottom: 20px; width: 100%; max-width: 300px; cursor: pointer; }
+        
+        /* Card Display */
+        .caption-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 3rem 2rem; border-radius: 20px; border: 2px solid var(--accent); margin-top: 2rem; position: relative; box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .caption-text { font-size: 1.8rem; font-weight: bold; line-height: 1.4; color: #fff; }
+        
+        button { background-color: var(--primary); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.2rem; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 2rem; box-shadow: 0 10px 20px rgba(225, 29, 72, 0.3); }
+        button:hover { transform: translateY(-3px); background-color: var(--accent); }
+
+        .copy-hint { margin-top: 1rem; color: #94a3b8; font-size: 0.9rem; opacity: 0; transition: 0.3s; }
+        
+        /* Footer */
+        footer { text-align: center; margin-top: 4rem; padding: 2rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">EzGen<span>Tools</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="caption-gen.html" style="color: var(--accent);">Caption Gen</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Caption Generator 💬</h1>
+        <p style="color:#cbd5e1; font-size: 1.1rem;">สุ่มแคปชั่นเด็ดๆ ไว้โพสต์เรียกไลค์ (เลือกหมวดหมู่ได้เลย!)</p>
+
+        <select id="category" class="category-select">
+            <option value="all">🎲 รวมมิตร (Random)</option>
+            <option value="flirty">😘 แคปชั่นอ่อย/จีบ</option>
+            <option value="funny">🤣 สายฮา/กวนตีน</option>
+            <option value="work">💼 มนุษย์เงินเดือน</option>
+            <option value="money">💸 สายแม่ค้า/เรื่องเงิน</option>
+        </select>
+
+        <div class="caption-card" id="cardArea">
+            <div class="caption-text" id="captionResult">"กดปุ่มด้านล่าง<br>เพื่อสุ่มแคปชั่นโดนๆ"</div>
+            <div class="copy-hint" id="copyHint">✅ คัดลอกแล้ว!</div>
+        </div>
+
+        <button onclick="genCaption()">สุ่มแคปชั่นใหม่! 🔄</button>
+    </div>
+
+    <footer>&copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️</footer>
+
+    <script>
+        const captions = {
+            flirty: [
+                "จ้องคอมแล้วตาเบลอ แต่ถ้าจ้องเธออ่ะตาลาย 😘",
+                "แดดแรงทำให้หน้าดำ แต่ถ้าเจอเธอจังๆ ทำให้หน้าแดง",
+                "กาแฟเรียกคอฟฟี่ แฟนเราไม่มีอันนี้เรียกโสด",
+                "ไม่อยากเป็น a-z แต่อยากเป็น u 🤟",
+                "หน้าตาซื่อๆ บอกหนูทื่อได้ไง",
+                "เบื่อชีวิตอิสระ อยากหาจังหวะมีเจ้าของ",
+                "ที่ยิ้มกว้างเพราะคนข้างๆ เป็นเธอ"
+            ],
+            funny: [
+                "เรื่องกินเรื่องใหญ่ เรื่องหัวใจเอาไว้ก่อน 🍜",
+                "เงินในบัญชีคือมายา บิลตรงหน้าคือของจริง",
+                "อ้วนแล้วไง... หนักหัวใครที่ไหน หนักตัวกูเนี่ย!",
+                "เป็นคนไม่ถือตัว... ส่วนใหญ่ถือแต่แก้วเหล้า 🍻",
+                "ความรักก็เหมือนหมูสามชั้น อร่อยแต่ไขมันอุดตัน",
+                "ชีวิตดี๊ดี... ดีนะที่ยังไม่ตาย",
+                "สตรีมีคลาส คือสตรีที่ฉลาดเรื่องกิน"
+            ],
+            work: [
+                "วันจันทร์คือวันเริ่มต้น... เริ่มต้นความขี้เกียจ",
+                "งานคือเงิน เงินคืองาน บันดาลสุข (หรอ?)",
+                "อยากลาออกสักวันละ 100 รอบ แต่เงินในบัญชีบอกให้สู้",
+                "ใจอยู่ที่ทะเล แต่ร่างเปื่อยๆ อยู่ที่ออฟฟิศ",
+                "วันหยุดมีน้อย ใช้สอยอย่างประหยัด",
+                "เจ้านายสั่งงานเหมือนโกรธใครมา",
+                "สู้ชีวิตแต่ชีวิตสู้กลับ!"
+            ],
+            money: [
+                "เงินซื้อความสุขไม่ได้ แต่ซื้อของกินได้ จบนะ",
+                "เศรษฐกิจแบบนี้... มีผัวดีกว่ามีเงิน (หรอ?)",
+                "รวยแต่เขือ... เหลือแต่ความสวย",
+                "โอนไว โอนจริง ต้องลูกค้าที่น่ารัก",
+                "ขายของได้กำไรหลักร้อย แต่ช้อปปิ้งหลักล้าน",
+                "ความรวยไม่เข้าใครออกใคร แต่ความจนเข้าแล้วไม่ออกเลย"
+            ]
+        };
+
+        function genCaption() {
+            const cat = document.getElementById('category').value;
+            let pool = [];
+            
+            if (cat === 'all') {
+                // รวมทุกหมวด
+                pool = [...captions.flirty, ...captions.funny, ...captions.work, ...captions.money];
+            } else {
+                pool = captions[cat];
+            }
+
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            const text = pool[randomIndex];
+            
+            // แสดงผล
+            document.getElementById('captionResult').innerHTML = text;
+            
+            // Copy อัตโนมัติ
+            navigator.clipboard.writeText(text);
+            
+            // Show hint
+            const hint = document.getElementById('copyHint');
+            hint.style.opacity = '1';
+            setTimeout(() => { hint.style.opacity = '0'; }, 1500);
+        }
+    </script>
+
+</body>
+</html>
