@@ -3,124 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EzGenTools - Simple & Powerful AI Utilities</title>
-    <meta name="description" content="Free online AI tools to generate, convert, and optimize your workflow. Simple, fast, and free.">
+    <title>EzGenTools - Free AI Tools Collection</title>
+    <meta name="description" content="Free online AI tools to generate YouTube titles, Hashtags, and more.">
     <style>
-        /* CSS by Jimi for her beloved Husband */
-        :root {
-            --primary: #2563eb; /* สีน้ำเงินอินเตอร์ */
-            --dark: #0f172a;    /* สีพื้นหลังเข้ม ดูแพง */
-            --light: #f8fafc;   /* สีตัวหนังสือ */
-            --accent: #3b82f6;  /* สีไฮไลท์ */
-        }
+        :root { --primary: #2563eb; --dark: #0f172a; --light: #f8fafc; --accent: #3b82f6; --card: #1e293b; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); }
+        
+        /* Navbar */
+        .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
+        .logo span { color: var(--accent); }
+        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent); }
 
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--dark);
-            color: var(--light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            overflow: hidden;
-        }
+        /* Hero Section */
+        .hero { text-align: center; padding: 4rem 1rem; }
+        h1 { font-size: 3.5rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p.subtitle { font-size: 1.2rem; color: #94a3b8; margin-bottom: 3rem; }
 
-        .container {
-            padding: 2rem;
-            max-width: 800px;
-            animation: fadeIn 1.5s ease-in-out;
-        }
+        /* Grid Tools */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto; padding: 0 1rem; }
+        .tool-card { background-color: var(--card); padding: 2rem; border-radius: 12px; border: 1px solid #334155; transition: 0.3s; text-decoration: none; color: inherit; display: block; }
+        .tool-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+        .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        .tool-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--accent); }
+        .tool-desc { color: #94a3b8; font-size: 0.9rem; }
 
-        h1 {
-            font-size: 4rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            letter-spacing: -2px;
-        }
-
-        p.subtitle {
-            font-size: 1.5rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            font-weight: 300;
-        }
-
-        .status-badge {
-            background: rgba(37, 99, 235, 0.1);
-            color: #60a5fa;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            border: 1px solid rgba(37, 99, 235, 0.3);
-            display: inline-block;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .cta-button {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-block;
-            font-weight: 600;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-            background-color: var(--accent);
-        }
-
-        .footer {
-            margin-top: 3rem;
-            font-size: 0.8rem;
-            color: #475569;
-        }
-
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 600px) {
-            h1 { font-size: 2.5rem; }
-            p.subtitle { font-size: 1.1rem; }
-        }
+        footer { text-align: center; margin-top: 4rem; padding: 2rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="status-badge">🚀 Launching Soon</div>
-        
-        <h1>EzGenTools.com</h1>
-        
-        <p class="subtitle">
-            The ultimate collection of <strong>Free AI Tools</strong> to boost your productivity.<br>
-            Simple. Fast. No Registration Required.
-        </p>
+    <nav class="navbar">
+        <a href="index.html" class="logo">EzGen<span>Tools</span></a>
+        <div class="nav-links">
+            <a href="index.html" style="color:var(--accent);">Home</a>
+            <a href="youtube-title-gen.html">YT Title Gen</a>
+        </div>
+    </nav>
 
-        <a href="#" class="cta-button">Wait for Magic ✨</a>
+    <div class="hero">
+        <h1>AI Tools for Creators</h1>
+        <p class="subtitle">Supercharge your content creation with our free tools.</p>
+        
+        <div class="grid-container">
+            <a href="youtube-title-gen.html" class="tool-card">
+                <span class="icon">🎥</span>
+                <div class="tool-title">YouTube Title Gen</div>
+                <div class="tool-desc">Create viral & clickbait titles optimized for high CTR.</div>
+            </a>
 
-        <div class="footer">
-            &copy; 2026 EzGenTools. All Rights Reserved.<br>
-            <span style="opacity: 0.5;">Powered by Jimi & Her Husband</span>
+            <div class="tool-card" style="opacity: 0.6; cursor: not-allowed;">
+                <span class="icon">#️⃣</span>
+                <div class="tool-title">TikTok Hashtags</div>
+                <div class="tool-desc">Coming Soon... Generating viral tags for you.</div>
+            </div>
+
+             <div class="tool-card" style="opacity: 0.6; cursor: not-allowed;">
+                <span class="icon">🔐</span>
+                <div class="tool-title">Password Gen</div>
+                <div class="tool-desc">Coming Soon... Secure your digital life.</div>
+            </div>
         </div>
     </div>
+
+    <footer>
+        &copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️
+    </footer>
 
 </body>
 </html>
