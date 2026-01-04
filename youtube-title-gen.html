@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral YouTube Title Generator - EzGenTools</title>
+    <meta name="description" content="Generate catchy, clickbait, and SEO-friendly YouTube titles instantly for free.">
+    <style>
+        /* CSS ชุดเดิมแต่เพิ่ม Navbar */
+        :root { --primary: #2563eb; --dark: #0f172a; --light: #f8fafc; --accent: #3b82f6; --card: #1e293b; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); line-height: 1.6; }
+        
+        /* Navbar */
+        .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
+        .logo span { color: var(--accent); }
+        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--accent); }
+
+        /* Content */
+        .container { max-width: 800px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(to right, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Tool Box */
+        .tool-box { background-color: var(--card); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155; margin-top: 2rem; }
+        input[type="text"] { width: 70%; padding: 15px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 1.1rem; margin-right: 10px; }
+        button { background-color: var(--primary); color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: var(--accent); transform: scale(1.05); }
+
+        /* Results */
+        .results-area { margin-top: 2rem; text-align: left; display: none; }
+        .result-item { background: #0f172a; padding: 1rem; margin-bottom: 0.8rem; border-radius: 8px; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center; }
+        .copy-btn { background: transparent; border: 1px solid #475569; padding: 5px 10px; font-size: 0.8rem; }
+        
+        /* Footer */
+        footer { text-align: center; margin-top: 4rem; padding: 2rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; }
+
+        @media (max-width: 600px) { input[type="text"] { width: 100%; margin-bottom: 10px; } button { width: 100%; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">EzGen<span>Tools</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="youtube-title-gen.html" style="color: var(--accent);">YT Title Gen</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>YouTube Title Generator 🎥</h1>
+        <p>Create viral, click-worthy titles for your videos in seconds.</p>
+
+        <div class="tool-box">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center;">
+                <input type="text" id="keyword" placeholder="Enter your video topic (e.g., 'Cat', 'Bitcoin')">
+                <button onclick="generateTitles()">Generate 🔥</button>
+            </div>
+
+            <div id="results" class="results-area">
+                <h3>👇 Copy these titles:</h3>
+                <div id="list"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️
+    </footer>
+
+    <script>
+        function generateTitles() {
+            const kw = document.getElementById('keyword').value.trim();
+            const list = document.getElementById('list');
+            const resArea = document.getElementById('results');
+            
+            if (!kw) { alert("Please enter a topic first!"); return; }
+
+            // สูตรลับการตั้งชื่อคลิป (Templates)
+            const templates = [
+                "Why {kw} is Taking Over the World 🌍",
+                "I Tried {kw} for 7 Days (Shocking Results!) 😱",
+                "Stop Doing {kw} WRONG! (Do This Instead)",
+                "The Ultimate Guide to {kw} in 2026",
+                "10 Secrets About {kw} No One Tells You 🤫",
+                "Is {kw} Worth It? An Honest Review",
+                "{kw}: The Good, The Bad, and The Ugly",
+                "How to Master {kw} in 5 Minutes ⏱️",
+                "The Dark Truth About {kw}...",
+                "{kw} for Beginners: Start Here!"
+            ];
+
+            let html = "";
+            templates.forEach(t => {
+                let title = t.replace("{kw}", kw); // แทนที่คำ
+                // เพิ่มปุ่ม Copy และจัดรูปแบบ
+                html += `
+                <div class="result-item">
+                    <span>${title}</span>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${title}');this.innerText='Copied!'">Copy</button>
+                </div>`;
+            });
+
+            list.innerHTML = html;
+            resArea.style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
