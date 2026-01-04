@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote Maker - Create Beautiful Text Images - EzGenTools</title>
-    <meta name="description" content="Create stunning quote images with beautiful gradient backgrounds. Type text, customize colors, and save as an image to share on Facebook and Instagram.">
+    <title>Quote Maker - EzGenTools</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         /* Theme */
@@ -15,29 +14,39 @@
         .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; backdrop-filter: blur(10px); }
         .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
         .logo span { color: var(--accent); }
-        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; font-weight: 500; transition: 0.3s; }
+        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; font-weight: 500; }
 
         /* Container */
         .container { 
             max-width: 900px; 
             margin: 0 auto; 
-            padding: 4rem 1rem; /* 🔥 เพิ่ม Padding ด้านบนให้เยอะขึ้น */
+            padding: 2rem 1rem; 
             text-align: center; 
         }
-        
-        h1 { font-size: 3rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #f59e0b, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        p.desc { color: #94a3b8; margin-bottom: 3rem; font-size: 1.1rem; }
 
-        /* Editor Layout - PC */
-        .editor-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 350px; 
-            gap: 2rem; 
-            align-items: start;
-            margin-top: 2rem; /* ระยะห่างปกติใน PC */
+        /* Spacers (ตัวดันระยะห่างแบบบังคับ) */
+        .spacer-small { height: 20px; width: 100%; display: block; }
+        .spacer-large { height: 60px; width: 100%; display: block; } /* 🔥 ดันให้ห่างกันสุดๆ */
+
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #f59e0b, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p.desc { color: #94a3b8; font-size: 1.1rem; }
+
+        /* Layout */
+        .editor-wrapper {
+            display: flex;
+            flex-wrap: wrap; /* ยอมให้ตกบรรทัด */
+            gap: 2rem;
+            justify-content: center;
+            align-items: flex-start;
         }
-        
+
         /* Preview Area */
+        .preview-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            width: 100%;
+        }
         .preview-container {
             width: 100%;
             aspect-ratio: 1 / 1; 
@@ -46,55 +55,51 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 3rem;
+            padding: 2rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             overflow: hidden;
             position: relative;
-            z-index: 1; /* จัดลำดับชั้นให้ถูกต้อง */
         }
-        
         #quoteTextDisplay {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: bold;
             color: white;
             text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             word-wrap: break-word;
             white-space: pre-wrap; 
         }
-        .watermark { position: absolute; bottom: 15px; right: 20px; font-size: 0.9rem; opacity: 0.7; color: white; }
 
         /* Controls Area */
-        .controls { background: var(--card); padding: 2rem; border-radius: 16px; border: 1px solid #334155; text-align: left; }
-        textarea { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #475569; background: #0f172a; color: white; font-size: 1.1rem; outline: none; resize: vertical; margin-bottom: 1.5rem; font-family: inherit; box-sizing: border-box; }
-        
-        .label { font-weight: bold; margin-bottom: 10px; display: block; color: var(--accent); }
+        .controls-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            width: 100%;
+            background: var(--card); 
+            padding: 2rem; 
+            border-radius: 16px; 
+            border: 1px solid #334155; 
+            text-align: left;
+        }
+
+        textarea { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #475569; background: #0f172a; color: white; font-size: 1rem; outline: none; margin-bottom: 1rem; box-sizing: border-box; }
         .bg-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-        .bg-btn { width: 100%; padding-bottom: 100%; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.3s; }
-        .bg-btn:hover, .bg-btn.active { border-color: white; transform: scale(1.1); }
+        .bg-btn { padding-bottom: 100%; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
+        .bg-btn.active { border-color: white; }
         
-        .action-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
         .btn-save { background: var(--primary); color: white; }
-        .btn-save:hover { background: var(--accent); }
-        .btn-share { background: #1877f2; color: white; } 
-        .btn-share:hover { background: #166fe5; }
         .btn-random { background: #334155; color: white; }
-        .btn-random:hover { background: #475569; }
 
-        footer { margin-top: 4rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; padding: 2rem; }
+        footer { margin-top: 4rem; color: #64748b; font-size: 0.9rem; padding: 2rem; }
 
-        /* 🔥 MOBILE FIX: แก้ปัญหาทับกันในมือถือโดยเฉพาะ */
-        @media (max-width: 768px) { 
-            .editor-grid { 
-                display: flex;           /* เปลี่ยนจาก Grid เป็น Flex เพื่อการเรียงตัวที่ดีกว่า */
-                flex-direction: column;  /* เรียงจากบนลงล่าง */
-                gap: 3rem;               /* เพิ่มช่องว่างระหว่างกล่องพรีวิวกับปุ่มควบคุม */
-                margin-top: 1rem;
-            } 
-            .preview-container { 
-                margin-bottom: 1rem;     /* กันเหนียว: ดันปุ่มข้างล่างลงไปอีก */
-            }
-            h1 { font-size: 2.2rem; }    /* ลดขนาดหัวข้อลงหน่อยจะได้ไม่เบียด */
+        /* 🔥 Mobile Specific Fix */
+        @media (max-width: 768px) {
+            .container { padding-top: 2rem; }
+            .editor-wrapper { flex-direction: column; align-items: center; gap: 0; }
+            /* สั่งให้ส่วนควบคุมถอยห่างลงไปอีก 50px */
+            .controls-section { margin-top: 50px !important; } 
         }
     </style>
 </head>
@@ -109,103 +114,77 @@
     </nav>
 
     <div class="container">
-        <h1>Quote Maker 🎨</h1>
-        <p class="desc">Create beautiful quote images with stunning gradients. Type your text, customize background, and save instantly!</p>
+        <div class="spacer-small"></div> 
 
-        <div class="editor-grid">
-            <div id="captureArea" class="preview-container">
-                <div id="quoteTextDisplay">Type your text here...</div>
-                <div class="watermark">ezgentools.com</div>
+        <h1>Quote Maker 🎨</h1>
+        <p class="desc">Create beautiful quotes and share instantly.</p>
+
+        <div class="spacer-small"></div>
+
+        <div class="editor-wrapper">
+            
+            <div class="preview-section">
+                <div id="captureArea" class="preview-container">
+                    <div id="quoteTextDisplay">Type your text...</div>
+                </div>
             </div>
 
-            <div class="controls">
-                <label class="label">1. Type your quote:</label>
-                <textarea id="quoteInput" rows="4" placeholder="Type something inspiring here...">Type your text here...</textarea>
+            <div class="spacer-large"></div>
 
-                <label class="label">2. Choose Background (or Random):</label>
+            <div class="controls-section">
+                <label style="color:var(--accent); display:block; margin-bottom:10px;"><b>1. Your Text:</b></label>
+                <textarea id="quoteInput" rows="3" placeholder="Type here...">Type your text...</textarea>
+
+                <label style="color:var(--accent); display:block; margin-bottom:10px;"><b>2. Background:</b></label>
                 <div class="bg-options">
                     <div class="bg-btn active" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="changeBg(this)"></div>
                     <div class="bg-btn" style="background: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);" onclick="changeBg(this)"></div>
                     <div class="bg-btn" style="background: linear-gradient(to right, #00c6ff, #0072ff);" onclick="changeBg(this)"></div>
                     <div class="bg-btn" style="background: linear-gradient(to right, #f093fb 0%, #f5576c 100%);" onclick="changeBg(this)"></div>
                 </div>
-                <button class="action-btn btn-random" onclick="randomBg()">🎲 Random Background</button>
-
-                <label class="label" style="margin-top: 1.5rem;">3. Save & Share:</label>
-                <button class="action-btn btn-save" onclick="saveImage()">📸 Save Image (PNG)</button>
-                <button class="action-btn btn-share" onclick="shareToFb()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>
-                    Share to Facebook
-                </button>
-                <small style="color: #94a3b8; display: block; margin-top: 5px; font-size: 0.8rem;">*Clicking share will open Facebook. Please upload the saved image manually.</small>
+                <button class="btn-random" onclick="randomBg()">🎲 Random BG</button>
+                
+                <div class="spacer-small"></div>
+                <button class="btn-save" onclick="saveImage()">📸 Save Image</button>
             </div>
         </div>
     </div>
 
-    <footer>&copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️</footer>
+    <footer>&copy; 2026 EzGenTools.com</footer>
 
     <script>
-        // --- Logic ---
-
         const quoteInput = document.getElementById('quoteInput');
         const quoteTextDisplay = document.getElementById('quoteTextDisplay');
         const captureArea = document.getElementById('captureArea');
         const bgBtns = document.querySelectorAll('.bg-btn');
 
-        // 1. Real-time update
-        quoteInput.addEventListener('input', function() {
-            quoteTextDisplay.innerText = this.value || 'Type your text here...';
-        });
+        quoteInput.addEventListener('input', function() { quoteTextDisplay.innerText = this.value || 'Type your text...'; });
 
-        // 2. Change Background
-        function changeBg(element) {
+        function changeBg(el) {
             bgBtns.forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-            captureArea.style.background = element.style.background;
+            el.classList.add('active');
+            captureArea.style.background = el.style.background;
         }
 
-        // 3. Random Background
         function randomBg() {
-            bgBtns.forEach(btn => btn.classList.remove('active'));
-            const color1 = '#' + Math.floor(Math.random()*16777215).toString(16);
-            const color2 = '#' + Math.floor(Math.random()*16777215).toString(16);
-            const deg = Math.floor(Math.random() * 360);
-            const gradient = `linear-gradient(${deg}deg, ${color1}, ${color2})`;
-            captureArea.style.background = gradient;
+            const c1 = '#' + Math.floor(Math.random()*16777215).toString(16);
+            const c2 = '#' + Math.floor(Math.random()*16777215).toString(16);
+            captureArea.style.background = `linear-gradient(${Math.floor(Math.random()*360)}deg, ${c1}, ${c2})`;
         }
 
-        // 4. Save Image
         function saveImage() {
             const btn = document.querySelector('.btn-save');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '⏳ Saving...'; 
-
-            html2canvas(captureArea, {
-                scale: 2, 
-                backgroundColor: null 
-            }).then(canvas => {
+            const original = btn.innerText;
+            btn.innerText = '⏳ Saving...';
+            html2canvas(captureArea, { scale: 2, backgroundColor: null }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'quote-ezgentools.png';
+                link.download = 'quote.png';
                 link.href = canvas.toDataURL('image/png');
-                link.click(); 
-
-                btn.innerHTML = '✅ Saved!';
-                setTimeout(() => { btn.innerHTML = originalText; }, 2000);
-            }).catch(err => {
-                alert('Error saving image.');
-                btn.innerHTML = originalText;
+                link.click();
+                btn.innerText = '✅ Saved!';
+                setTimeout(() => btn.innerText = original, 2000);
             });
         }
-
-        // 5. Share to FB
-        function shareToFb() {
-            const url = encodeURIComponent(window.location.href);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
-            
-            // English Tip
-            alert("👉 Tip: The image has been saved to your device!\n\nIn the Facebook window, please click 'Photo/Video' and upload the image you just saved.");
-        }
     </script>
-
 </body>
 </html>
