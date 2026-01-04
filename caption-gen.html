@@ -1,41 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Caption Generator - แคปชั่นเด็ด โพสต์ปุ๊บ ไลค์ปั๊บ</title>
-    <meta name="description" content="รวมแคปชั่นเด็ดๆ แคปชั่นอ่อย คำคมคนทำงาน สุ่มแคปชั่นฟรี เอาไปโพสต์เฟสบุ๊ค ไอจี ได้เลย">
+    <title>AI Smart Caption - แคปชั่นเด็ดตามสั่ง by EzGenTools</title>
+    <meta name="description" content="เครื่องมือแต่งแคปชั่นอัตโนมัติ แค่พิมพ์คำเดียว ระบบ AI จะคิดแคปชั่นเด็ดๆ ให้ทันที ฟรี!">
     <style>
-        /* CSS Theme เดิม */
-        :root { --primary: #e11d48; /* สีชมพูแดงๆ ให้ดูแซ่บ */ --dark: #0f172a; --light: #f8fafc; --accent: #fb7185; --card: #1e293b; }
-        body { margin: 0; font-family: 'Sarabun', 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); }
+        /* Theme เดิมแต่ปรับให้ดู Pro ขึ้น */
+        :root { --primary: #8b5cf6; /* สีม่วง AI */ --dark: #0f172a; --light: #f8fafc; --accent: #a78bfa; --card: #1e293b; }
+        body { margin: 0; font-family: 'Sarabun', sans-serif; background-color: var(--dark); color: var(--light); line-height: 1.6; }
         
         /* Navbar */
         .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
         .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
-        .logo span { color: #3b82f6; } /* สีฟ้าเดิม */
-        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; font-weight: 500; }
-
+        .logo span { color: var(--accent); }
+        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; transition: 0.3s; }
+        
         /* Container */
         .container { max-width: 700px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
-        h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(to right, #e11d48, #fb7185); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* Controls */
-        .category-select { padding: 15px; border-radius: 8px; background: #1e293b; color: white; border: 1px solid #475569; font-size: 1.1rem; margin-bottom: 20px; width: 100%; max-width: 300px; cursor: pointer; }
-        
-        /* Card Display */
-        .caption-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 3rem 2rem; border-radius: 20px; border: 2px solid var(--accent); margin-top: 2rem; position: relative; box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); min-height: 150px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .caption-text { font-size: 1.8rem; font-weight: bold; line-height: 1.4; color: #fff; }
-        
-        button { background-color: var(--primary); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.2rem; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 2rem; box-shadow: 0 10px 20px rgba(225, 29, 72, 0.3); }
-        button:hover { transform: translateY(-3px); background-color: var(--accent); }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p.desc { color: #94a3b8; margin-bottom: 2rem; }
 
-        .copy-hint { margin-top: 1rem; color: #94a3b8; font-size: 0.9rem; opacity: 0; transition: 0.3s; }
+        /* Input Area */
+        .input-box { position: relative; max-width: 500px; margin: 0 auto 2rem auto; }
+        input[type="text"] { width: 100%; padding: 15px 20px; border-radius: 50px; border: 2px solid #475569; background: #1e293b; color: white; font-size: 1.2rem; outline: none; transition: 0.3s; box-sizing: border-box; text-align: center; }
+        input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
         
-        /* Footer */
-        footer { text-align: center; margin-top: 4rem; padding: 2rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; }
+        button.gen-btn { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 12px 40px; border: none; border-radius: 50px; font-size: 1.2rem; cursor: pointer; font-weight: bold; margin-top: 15px; box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); transition: 0.3s; }
+        button.gen-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+
+        /* Results Area */
+        .results-list { text-align: left; display: none; margin-top: 2rem; }
+        .caption-item { background: var(--card); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #334155; position: relative; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; }
+        .caption-item:hover { transform: translateX(5px); border-color: var(--accent); }
+        .caption-text { font-size: 1.1rem; color: #e2e8f0; font-weight: 500; padding-right: 10px; }
+        
+        .copy-btn { background: rgba(255,255,255,0.1); border: 1px solid #64748b; color: #94a3b8; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; white-space: nowrap; }
+        .copy-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* Tags */
+        .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; margin-right: 10px; font-weight: bold; }
+        .tag-love { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+        .tag-funny { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+        .tag-cool { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+        footer { margin-top: 4rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; padding: 2rem; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -48,91 +59,89 @@
     </nav>
 
     <div class="container">
-        <h1>Caption Generator 💬</h1>
-        <p style="color:#cbd5e1; font-size: 1.1rem;">สุ่มแคปชั่นเด็ดๆ ไว้โพสต์เรียกไลค์ (เลือกหมวดหมู่ได้เลย!)</p>
+        <h1>AI Smart Caption 🧠</h1>
+        <p class="desc">พิมพ์คำที่คุณต้องการ (เช่น กาแฟ, ทะเล, แฟน, เงิน) แล้วให้ AI แต่งประโยคให้!</p>
 
-        <select id="category" class="category-select">
-            <option value="all">🎲 รวมมิตร (Random)</option>
-            <option value="flirty">😘 แคปชั่นอ่อย/จีบ</option>
-            <option value="funny">🤣 สายฮา/กวนตีน</option>
-            <option value="work">💼 มนุษย์เงินเดือน</option>
-            <option value="money">💸 สายแม่ค้า/เรื่องเงิน</option>
-        </select>
-
-        <div class="caption-card" id="cardArea">
-            <div class="caption-text" id="captionResult">"กดปุ่มด้านล่าง<br>เพื่อสุ่มแคปชั่นโดนๆ"</div>
-            <div class="copy-hint" id="copyHint">✅ คัดลอกแล้ว!</div>
+        <div class="input-box">
+            <input type="text" id="keyword" placeholder="พิมพ์ 1 คำที่นี่... (เช่น แมว)">
+            <button class="gen-btn" onclick="generateSmartCaptions()">เสกแคปชั่น ✨</button>
         </div>
 
-        <button onclick="genCaption()">สุ่มแคปชั่นใหม่! 🔄</button>
+        <div id="results" class="results-list">
+            </div>
     </div>
 
     <footer>&copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️</footer>
 
     <script>
-        const captions = {
-            flirty: [
-                "จ้องคอมแล้วตาเบลอ แต่ถ้าจ้องเธออ่ะตาลาย 😘",
-                "แดดแรงทำให้หน้าดำ แต่ถ้าเจอเธอจังๆ ทำให้หน้าแดง",
-                "กาแฟเรียกคอฟฟี่ แฟนเราไม่มีอันนี้เรียกโสด",
-                "ไม่อยากเป็น a-z แต่อยากเป็น u 🤟",
-                "หน้าตาซื่อๆ บอกหนูทื่อได้ไง",
-                "เบื่อชีวิตอิสระ อยากหาจังหวะมีเจ้าของ",
-                "ที่ยิ้มกว้างเพราะคนข้างๆ เป็นเธอ"
-            ],
-            funny: [
-                "เรื่องกินเรื่องใหญ่ เรื่องหัวใจเอาไว้ก่อน 🍜",
-                "เงินในบัญชีคือมายา บิลตรงหน้าคือของจริง",
-                "อ้วนแล้วไง... หนักหัวใครที่ไหน หนักตัวกูเนี่ย!",
-                "เป็นคนไม่ถือตัว... ส่วนใหญ่ถือแต่แก้วเหล้า 🍻",
-                "ความรักก็เหมือนหมูสามชั้น อร่อยแต่ไขมันอุดตัน",
-                "ชีวิตดี๊ดี... ดีนะที่ยังไม่ตาย",
-                "สตรีมีคลาส คือสตรีที่ฉลาดเรื่องกิน"
-            ],
-            work: [
-                "วันจันทร์คือวันเริ่มต้น... เริ่มต้นความขี้เกียจ",
-                "งานคือเงิน เงินคืองาน บันดาลสุข (หรอ?)",
-                "อยากลาออกสักวันละ 100 รอบ แต่เงินในบัญชีบอกให้สู้",
-                "ใจอยู่ที่ทะเล แต่ร่างเปื่อยๆ อยู่ที่ออฟฟิศ",
-                "วันหยุดมีน้อย ใช้สอยอย่างประหยัด",
-                "เจ้านายสั่งงานเหมือนโกรธใครมา",
-                "สู้ชีวิตแต่ชีวิตสู้กลับ!"
-            ],
-            money: [
-                "เงินซื้อความสุขไม่ได้ แต่ซื้อของกินได้ จบนะ",
-                "เศรษฐกิจแบบนี้... มีผัวดีกว่ามีเงิน (หรอ?)",
-                "รวยแต่เขือ... เหลือแต่ความสวย",
-                "โอนไว โอนจริง ต้องลูกค้าที่น่ารัก",
-                "ขายของได้กำไรหลักร้อย แต่ช้อปปิ้งหลักล้าน",
-                "ความรวยไม่เข้าใครออกใคร แต่ความจนเข้าแล้วไม่ออกเลย"
-            ]
-        };
-
-        function genCaption() {
-            const cat = document.getElementById('category').value;
-            let pool = [];
+        function generateSmartCaptions() {
+            let kw = document.getElementById('keyword').value.trim();
+            const resDiv = document.getElementById('results');
             
-            if (cat === 'all') {
-                // รวมทุกหมวด
-                pool = [...captions.flirty, ...captions.funny, ...captions.work, ...captions.money];
-            } else {
-                pool = captions[cat];
+            if (!kw) { 
+                kw = "ความรัก"; // ถ้าไม่พิมพ์อะไร ใส่ค่า default ให้
             }
 
-            const randomIndex = Math.floor(Math.random() * pool.length);
-            const text = pool[randomIndex];
-            
-            // แสดงผล
-            document.getElementById('captionResult').innerHTML = text;
-            
-            // Copy อัตโนมัติ
-            navigator.clipboard.writeText(text);
-            
-            // Show hint
-            const hint = document.getElementById('copyHint');
-            hint.style.opacity = '1';
-            setTimeout(() => { hint.style.opacity = '0'; }, 1500);
+            // --- 🧠 ส่วนสมองของ AI (Templates) ---
+            // เราจะเตรียมโครงประโยคไว้ แล้วเอา Keyword ไปแทรก
+            const templates = [
+                { text: `ถึงจะไม่มีแฟน แต่ยังมี ${kw} อยู่ข้างๆ เสมอ ❤️`, tag: "love" },
+                { text: `${kw} คือเหตุผลเดียวที่ทำให้ฉันยิ้มได้ในวันนี้ 😊`, tag: "love" },
+                { text: `โลกจะแตกก็ช่างมัน ขอแค่มี ${kw} ก็พอแล้ว`, tag: "love" },
+                { text: `บางทีความสุข ก็มาในรูปแบบของ "${kw}"`, tag: "cool" },
+                { text: `ชีวิตไม่ได้ต้องการอะไรมากไปกว่า ${kw} ดีๆ สักอัน`, tag: "cool" },
+                { text: `เสียเงินให้ ${kw} เป็นแสน แขนไม่ได้จับ! 💸`, tag: "funny" },
+                { text: `วันไหนที่รู้สึกแย่ ให้พาตัวเองไปหา ${kw}`, tag: "cool" },
+                { text: `กิน ${kw} แล้วไม่อ้วน ถือว่าเป็นยอดมนุษย์ 🐷`, tag: "funny" },
+                { text: `ความสัมพันธ์แบบ ${kw} ... อร่อยแต่ไม่มีสถานะ`, tag: "funny" },
+                { text: `โตแล้วต้องอดทน สิบล้อชนต้องไม่ตาย... แต่ถ้าขาด ${kw} ไป ตายแน่นอน!`, tag: "funny" },
+                { text: `รู้หน้าไม่รู้ใจ แต่รู้ไหมว่าชอบ ${kw} มากกกก`, tag: "love" },
+                { text: `วงการ ${kw} เข้าแล้วออกยาก (เพราะไม่มีเงินออก) 😂`, tag: "funny" }
+            ];
+
+            let html = `<h3>👇 ผลลัพธ์สำหรับคำว่า "${kw}"</h3>`;
+
+            // วนลูปสร้างการ์ด
+            templates.forEach(t => {
+                // กำหนดสีป้าย Tag
+                let tagClass = "";
+                let tagName = "";
+                if(t.tag === 'love') { tagClass = 'tag-love'; tagName = 'สายอ่อย'; }
+                else if(t.tag === 'funny') { tagClass = 'tag-funny'; tagName = 'สายฮา'; }
+                else { tagClass = 'tag-cool'; tagName = 'คำคม'; }
+
+                html += `
+                <div class="caption-item">
+                    <div>
+                        <span class="tag ${tagClass}">${tagName}</span>
+                        <span class="caption-text">${t.text}</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyText(this, '${t.text}')">Copy</button>
+                </div>
+                `;
+            });
+
+            resDiv.innerHTML = html;
+            resDiv.style.display = "block";
         }
+
+        function copyText(btn, text) {
+            navigator.clipboard.writeText(text);
+            let original = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#8b5cf6"; // สีม่วง
+            btn.style.color = "white";
+            setTimeout(() => {
+                btn.innerText = original;
+                btn.style.background = "";
+                btn.style.color = "";
+            }, 2000);
+        }
+
+        // กด Enter เพื่อค้นหาได้
+        document.getElementById("keyword").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") { generateSmartCaptions(); }
+        });
     </script>
 
 </body>
