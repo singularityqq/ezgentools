@@ -12,24 +12,29 @@
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); line-height: 1.6; }
         
         /* Navbar */
-        .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; backdrop-filter: blur(10px); }
         .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
         .logo span { color: var(--accent); }
         .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; font-weight: 500; transition: 0.3s; }
 
         /* Container */
-        .container { max-width: 900px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 4rem 1rem; /* 🔥 เพิ่ม Padding ด้านบนให้เยอะขึ้น */
+            text-align: center; 
+        }
+        
         h1 { font-size: 3rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #f59e0b, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        p.desc { color: #94a3b8; margin-bottom: 2rem; font-size: 1.1rem; }
+        p.desc { color: #94a3b8; margin-bottom: 3rem; font-size: 1.1rem; }
 
-        /* Editor Layout */
+        /* Editor Layout - PC */
         .editor-grid { 
             display: grid; 
             grid-template-columns: 1fr 350px; 
             gap: 2rem; 
             align-items: start;
-            /* ✅ Fix: Added margin to prevent overlapping */
-            margin-top: 3rem; 
+            margin-top: 2rem; /* ระยะห่างปกติใน PC */
         }
         
         /* Preview Area */
@@ -45,7 +50,9 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             overflow: hidden;
             position: relative;
+            z-index: 1; /* จัดลำดับชั้นให้ถูกต้อง */
         }
+        
         #quoteTextDisplay {
             font-size: 2.5rem;
             font-weight: bold;
@@ -59,7 +66,7 @@
 
         /* Controls Area */
         .controls { background: var(--card); padding: 2rem; border-radius: 16px; border: 1px solid #334155; text-align: left; }
-        textarea { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #475569; background: #0f172a; color: white; font-size: 1.1rem; outline: none; resize: vertical; margin-bottom: 1.5rem; font-family: inherit; }
+        textarea { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #475569; background: #0f172a; color: white; font-size: 1.1rem; outline: none; resize: vertical; margin-bottom: 1.5rem; font-family: inherit; box-sizing: border-box; }
         
         .label { font-weight: bold; margin-bottom: 10px; display: block; color: var(--accent); }
         .bg-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
@@ -75,7 +82,20 @@
         .btn-random:hover { background: #475569; }
 
         footer { margin-top: 4rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; padding: 2rem; }
-        @media (max-width: 768px) { .editor-grid { grid-template-columns: 1fr; } .preview-container { margin-bottom: 2rem; } }
+
+        /* 🔥 MOBILE FIX: แก้ปัญหาทับกันในมือถือโดยเฉพาะ */
+        @media (max-width: 768px) { 
+            .editor-grid { 
+                display: flex;           /* เปลี่ยนจาก Grid เป็น Flex เพื่อการเรียงตัวที่ดีกว่า */
+                flex-direction: column;  /* เรียงจากบนลงล่าง */
+                gap: 3rem;               /* เพิ่มช่องว่างระหว่างกล่องพรีวิวกับปุ่มควบคุม */
+                margin-top: 1rem;
+            } 
+            .preview-container { 
+                margin-bottom: 1rem;     /* กันเหนียว: ดันปุ่มข้างล่างลงไปอีก */
+            }
+            h1 { font-size: 2.2rem; }    /* ลดขนาดหัวข้อลงหน่อยจะได้ไม่เบียด */
+        }
     </style>
 </head>
 <body>
