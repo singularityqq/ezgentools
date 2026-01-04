@@ -1,52 +1,56 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Smart Caption - แคปชั่นเด็ดตามสั่ง by EzGenTools</title>
-    <meta name="description" content="เครื่องมือแต่งแคปชั่นอัตโนมัติ แค่พิมพ์คำเดียว ระบบ AI จะคิดแคปชั่นเด็ดๆ ให้ทันที ฟรี!">
+    <title>Instant Caption Generator - Aesthetic & Witty Captions</title>
+    <meta name="description" content="Free AI tool to generate aesthetic, funny, and viral Instagram/TikTok captions instantly. Just enter a keyword.">
     <style>
-        /* Theme เดิมแต่ปรับให้ดู Pro ขึ้น */
-        :root { --primary: #8b5cf6; /* สีม่วง AI */ --dark: #0f172a; --light: #f8fafc; --accent: #a78bfa; --card: #1e293b; }
-        body { margin: 0; font-family: 'Sarabun', sans-serif; background-color: var(--dark); color: var(--light); line-height: 1.6; }
+        /* Theme : Global Tech Style */
+        :root { --primary: #6366f1; /* Indigo */ --dark: #0f172a; --light: #f8fafc; --accent: #818cf8; --card: #1e293b; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); line-height: 1.6; }
         
         /* Navbar */
         .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
         .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
         .logo span { color: var(--accent); }
-        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; transition: 0.3s; }
+        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; transition: 0.3s; font-weight: 500; }
+        .nav-links a:hover { color: var(--accent); }
         
         /* Container */
-        .container { max-width: 700px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
-        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        p.desc { color: #94a3b8; margin-bottom: 2rem; }
+        .container { max-width: 800px; margin: 4rem auto; padding: 0 1rem; text-align: center; }
+        h1 { font-size: 3rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        p.desc { color: #94a3b8; font-size: 1.2rem; margin-bottom: 2.5rem; }
 
         /* Input Area */
-        .input-box { position: relative; max-width: 500px; margin: 0 auto 2rem auto; }
-        input[type="text"] { width: 100%; padding: 15px 20px; border-radius: 50px; border: 2px solid #475569; background: #1e293b; color: white; font-size: 1.2rem; outline: none; transition: 0.3s; box-sizing: border-box; text-align: center; }
-        input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+        .input-box { position: relative; max-width: 600px; margin: 0 auto 2rem auto; display:flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        input[type="text"] { flex: 1; padding: 15px 20px; border-radius: 12px; border: 2px solid #475569; background: #1e293b; color: white; font-size: 1.1rem; outline: none; transition: 0.3s; min-width: 200px; }
+        input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
         
-        button.gen-btn { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 12px 40px; border: none; border-radius: 50px; font-size: 1.2rem; cursor: pointer; font-weight: bold; margin-top: 15px; box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); transition: 0.3s; }
-        button.gen-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        button.gen-btn { background: var(--primary); color: white; padding: 15px 35px; border: none; border-radius: 12px; font-size: 1.1rem; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
+        button.gen-btn:hover { transform: translateY(-3px); background-color: var(--accent); }
 
         /* Results Area */
-        .results-list { text-align: left; display: none; margin-top: 2rem; }
+        .results-list { text-align: left; display: none; margin-top: 3rem; }
         .caption-item { background: var(--card); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #334155; position: relative; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; }
-        .caption-item:hover { transform: translateX(5px); border-color: var(--accent); }
-        .caption-text { font-size: 1.1rem; color: #e2e8f0; font-weight: 500; padding-right: 10px; }
+        .caption-item:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         
-        .copy-btn { background: rgba(255,255,255,0.1); border: 1px solid #64748b; color: #94a3b8; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; white-space: nowrap; }
+        .caption-content { flex: 1; padding-right: 15px; }
+        .caption-text { font-size: 1.1rem; color: #e2e8f0; font-weight: 500; display: block; margin-bottom: 5px; }
+        
+        .tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-aesthetic { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+        .tag-witty { background: rgba(234, 179, 8, 0.15); color: #facc15; }
+        .tag-short { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .tag-love { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+
+        .copy-btn { background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.3s; font-weight: 600; }
         .copy-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
-        /* Tags */
-        .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; margin-right: 10px; font-weight: bold; }
-        .tag-love { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
-        .tag-funny { background: rgba(234, 179, 8, 0.2); color: #facc15; }
-        .tag-cool { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-
-        footer { margin-top: 4rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; padding: 2rem; }
+        footer { margin-top: 5rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; padding: 2rem; }
+        
+        @media (max-width: 600px) { h1 { font-size: 2rem; } }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -59,12 +63,12 @@
     </nav>
 
     <div class="container">
-        <h1>AI Smart Caption 🧠</h1>
-        <p class="desc">พิมพ์คำที่คุณต้องการ (เช่น กาแฟ, ทะเล, แฟน, เงิน) แล้วให้ AI แต่งประโยคให้!</p>
+        <h1>Instant Caption Generator ✨</h1>
+        <p class="desc">Generate aesthetic, funny, and engaging captions for Instagram & TikTok. <br>Just enter a topic (e.g., Coffee, Travel, Friday).</p>
 
         <div class="input-box">
-            <input type="text" id="keyword" placeholder="พิมพ์ 1 คำที่นี่... (เช่น แมว)">
-            <button class="gen-btn" onclick="generateSmartCaptions()">เสกแคปชั่น ✨</button>
+            <input type="text" id="keyword" placeholder="Enter 1 word (Noun)... e.g. Pizza">
+            <button class="gen-btn" onclick="generateCaptions()">Generate ⚡</button>
         </div>
 
         <div id="results" class="results-list">
@@ -74,51 +78,75 @@
     <footer>&copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️</footer>
 
     <script>
-        function generateSmartCaptions() {
+        function generateCaptions() {
             let kw = document.getElementById('keyword').value.trim();
             const resDiv = document.getElementById('results');
             
-            if (!kw) { 
-                kw = "ความรัก"; // ถ้าไม่พิมพ์อะไร ใส่ค่า default ให้
-            }
+            // ถ้าไม่กรอกอะไร ให้สุ่มคำว่า "Vibes"
+            if (!kw) { kw = "Vibes"; }
 
-            // --- 🧠 ส่วนสมองของ AI (Templates) ---
-            // เราจะเตรียมโครงประโยคไว้ แล้วเอา Keyword ไปแทรก
+            // ทำให้ตัวแรกเป็นพิมพ์ใหญ่ (Capitalize)
+            kw = kw.charAt(0).toUpperCase() + kw.slice(1);
+
+            // --- 🇺🇸 English Templates Database ---
             const templates = [
-                { text: `ถึงจะไม่มีแฟน แต่ยังมี ${kw} อยู่ข้างๆ เสมอ ❤️`, tag: "love" },
-                { text: `${kw} คือเหตุผลเดียวที่ทำให้ฉันยิ้มได้ในวันนี้ 😊`, tag: "love" },
-                { text: `โลกจะแตกก็ช่างมัน ขอแค่มี ${kw} ก็พอแล้ว`, tag: "love" },
-                { text: `บางทีความสุข ก็มาในรูปแบบของ "${kw}"`, tag: "cool" },
-                { text: `ชีวิตไม่ได้ต้องการอะไรมากไปกว่า ${kw} ดีๆ สักอัน`, tag: "cool" },
-                { text: `เสียเงินให้ ${kw} เป็นแสน แขนไม่ได้จับ! 💸`, tag: "funny" },
-                { text: `วันไหนที่รู้สึกแย่ ให้พาตัวเองไปหา ${kw}`, tag: "cool" },
-                { text: `กิน ${kw} แล้วไม่อ้วน ถือว่าเป็นยอดมนุษย์ 🐷`, tag: "funny" },
-                { text: `ความสัมพันธ์แบบ ${kw} ... อร่อยแต่ไม่มีสถานะ`, tag: "funny" },
-                { text: `โตแล้วต้องอดทน สิบล้อชนต้องไม่ตาย... แต่ถ้าขาด ${kw} ไป ตายแน่นอน!`, tag: "funny" },
-                { text: `รู้หน้าไม่รู้ใจ แต่รู้ไหมว่าชอบ ${kw} มากกกก`, tag: "love" },
-                { text: `วงการ ${kw} เข้าแล้วออกยาก (เพราะไม่มีเงินออก) 😂`, tag: "funny" }
+                // 🟣 Aesthetic (สายคุมโทน สั้นๆ เท่ๆ)
+                { t: `Just ${kw} vibes. ✨`, tag: "aesthetic" },
+                { t: `Life is better with ${kw}.`, tag: "aesthetic" },
+                { t: `Current mood: ${kw}. ☁️`, tag: "aesthetic" },
+                { t: `In my ${kw} era.`, tag: "aesthetic" },
+                { t: `Chasing ${kw}.`, tag: "aesthetic" },
+                { t: `Peace, love, and ${kw}. ✌️`, tag: "aesthetic" },
+                { t: `Less perfection, more ${kw}.`, tag: "aesthetic" },
+                { t: `It’s a ${kw} kind of day.`, tag: "aesthetic" },
+
+                // 🟡 Witty/Funny (สายตลก สายกวน)
+                { t: `I run on caffeine and ${kw}. ☕`, tag: "witty" },
+                { t: `Sorry, I can’t. I have plans with ${kw}.`, tag: "witty" },
+                { t: `Relationship status: In love with ${kw}.`, tag: "witty" },
+                { t: `If lost, please return to ${kw}.`, tag: "witty" },
+                { t: `Born to ${kw}, forced to work.`, tag: "witty" },
+                { t: `Maybe ${kw} is the answer.`, tag: "witty" },
+                { t: `Does this ${kw} make me look famous?`, tag: "witty" },
+                { t: `Keep calm and trust ${kw}.`, tag: "witty" },
+                { t: `I put the "Pro" in ${kw}.`, tag: "witty" },
+
+                // 🔵 Short & Punchy (สั้นได้ใจความ)
+                { t: `${kw}. That’s it. That’s the caption.`, tag: "short" },
+                { t: `Simply ${kw}.`, tag: "short" },
+                { t: `More ${kw}, please.`, tag: "short" },
+                { t: `Hello, ${kw}. 👋`, tag: "short" },
+                { t: `POV: ${kw}.`, tag: "short" },
+                { t: `But first, ${kw}.`, tag: "short" },
+
+                // 🔴 Inspirational/Love (สายคม)
+                { t: `Believe in the power of ${kw}.`, tag: "love" },
+                { t: `Obsessed with ${kw}. ❤️`, tag: "love" },
+                { t: `Find your ${kw}.`, tag: "love" },
+                { t: `Everything starts with ${kw}.`, tag: "love" }
             ];
 
-            let html = `<h3>👇 ผลลัพธ์สำหรับคำว่า "${kw}"</h3>`;
+            // สุ่มลำดับผลลัพธ์ (Shuffle) เพื่อให้ไม่น่าเบื่อ
+            templates.sort(() => Math.random() - 0.5);
 
-            // วนลูปสร้างการ์ด
-            templates.forEach(t => {
-                // กำหนดสีป้าย Tag
-                let tagClass = "";
-                let tagName = "";
-                if(t.tag === 'love') { tagClass = 'tag-love'; tagName = 'สายอ่อย'; }
-                else if(t.tag === 'funny') { tagClass = 'tag-funny'; tagName = 'สายฮา'; }
-                else { tagClass = 'tag-cool'; tagName = 'คำคม'; }
+            let html = `
+                <div style="margin-bottom:20px; color:#cbd5e1;">
+                    Results for: <strong style="color:white;">${kw}</strong>
+                </div>`;
+
+            templates.forEach(item => {
+                // เลือกสีป้าย Tag
+                let tagClass = "tag-" + item.tag; 
+                let tagName = item.tag.toUpperCase();
 
                 html += `
                 <div class="caption-item">
-                    <div>
+                    <div class="caption-content">
                         <span class="tag ${tagClass}">${tagName}</span>
-                        <span class="caption-text">${t.text}</span>
+                        <span class="caption-text">${item.t}</span>
                     </div>
-                    <button class="copy-btn" onclick="copyText(this, '${t.text}')">Copy</button>
-                </div>
-                `;
+                    <button class="copy-btn" onclick="copyText(this, '${item.t.replace(/'/g, "\\'")}')">Copy</button>
+                </div>`;
             });
 
             resDiv.innerHTML = html;
@@ -129,7 +157,7 @@
             navigator.clipboard.writeText(text);
             let original = btn.innerText;
             btn.innerText = "Copied!";
-            btn.style.background = "#8b5cf6"; // สีม่วง
+            btn.style.background = "#818cf8";
             btn.style.color = "white";
             setTimeout(() => {
                 btn.innerText = original;
@@ -138,9 +166,9 @@
             }, 2000);
         }
 
-        // กด Enter เพื่อค้นหาได้
+        // Enter key support
         document.getElementById("keyword").addEventListener("keyup", function(event) {
-            if (event.key === "Enter") { generateSmartCaptions(); }
+            if (event.key === "Enter") { generateCaptions(); }
         });
     </script>
 
