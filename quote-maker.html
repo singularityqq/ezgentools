@@ -24,31 +24,28 @@
             text-align: center; 
         }
 
-        /* Spacers (ตัวดันระยะห่างแบบบังคับ) */
-        .spacer-small { height: 20px; width: 100%; display: block; }
-        .spacer-large { height: 60px; width: 100%; display: block; } /* 🔥 ดันให้ห่างกันสุดๆ */
-
         h1 { font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #f59e0b, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        p.desc { color: #94a3b8; font-size: 1.1rem; }
+        p.desc { color: #94a3b8; font-size: 1.1rem; margin-bottom: 2rem; }
 
-        /* Layout */
+        /* Layout Wrapper */
         .editor-wrapper {
             display: flex;
-            flex-wrap: wrap; /* ยอมให้ตกบรรทัด */
+            flex-wrap: wrap;
             gap: 2rem;
             justify-content: center;
             align-items: flex-start;
         }
 
-        /* Preview Area */
+        /* --- PREVIEW SECTION (น้องกล่องเขียว) --- */
         .preview-section {
             flex: 1;
             min-width: 300px;
-            max-width: 500px;
-            width: 100%;
+            display: flex;
+            justify-content: center; /* จัดกึ่งกลาง */
         }
         .preview-container {
             width: 100%;
+            max-width: 500px; /* ขนาดสูงสุดใน PC */
             aspect-ratio: 1 / 1; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
             border-radius: 20px;
@@ -57,8 +54,8 @@
             justify-content: center;
             padding: 2rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
         }
         #quoteTextDisplay {
             font-size: 2rem;
@@ -70,12 +67,11 @@
             white-space: pre-wrap; 
         }
 
-        /* Controls Area */
+        /* --- CONTROLS SECTION --- */
         .controls-section {
             flex: 1;
             min-width: 300px;
             max-width: 400px;
-            width: 100%;
             background: var(--card); 
             padding: 2rem; 
             border-radius: 16px; 
@@ -83,23 +79,40 @@
             text-align: left;
         }
 
+        /* Form Elements */
         textarea { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #475569; background: #0f172a; color: white; font-size: 1rem; outline: none; margin-bottom: 1rem; box-sizing: border-box; }
         .bg-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
         .bg-btn { padding-bottom: 100%; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
         .bg-btn.active { border-color: white; }
         
-        button { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        button:hover { transform: translateY(-2px); }
         .btn-save { background: var(--primary); color: white; }
         .btn-random { background: #334155; color: white; }
 
         footer { margin-top: 4rem; color: #64748b; font-size: 0.9rem; padding: 2rem; }
 
-        /* 🔥 Mobile Specific Fix */
+        /* 🔥 MOBILE FIX: ลดขนาดกล่องให้พอดีมือถือ 🔥 */
         @media (max-width: 768px) {
-            .container { padding-top: 2rem; }
-            .editor-wrapper { flex-direction: column; align-items: center; gap: 0; }
-            /* สั่งให้ส่วนควบคุมถอยห่างลงไปอีก 50px */
-            .controls-section { margin-top: 50px !important; } 
+            .container { padding-top: 1rem; }
+            
+            /* สั่งให้เรียงลงมา และห่างกัน 40px */
+            .editor-wrapper { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 40px; 
+            }
+
+            /* ลดขนาดน้องกล่องเขียวลง! */
+            .preview-container {
+                max-width: 300px; /* 👈 นี่คือคีย์สำคัญ! บังคับไม่ให้เกิน 300px */
+                margin: 0 auto;   /* จัดกึ่งกลางจอ */
+            }
+            
+            /* ลดขนาดตัวหนังสือในกล่องลงนิดนึงจะได้ไม่ล้น */
+            #quoteTextDisplay { font-size: 1.5rem; }
+
+            .controls-section { width: 100%; max-width: 320px; }
         }
     </style>
 </head>
@@ -114,12 +127,8 @@
     </nav>
 
     <div class="container">
-        <div class="spacer-small"></div> 
-
         <h1>Quote Maker 🎨</h1>
         <p class="desc">Create beautiful quotes and share instantly.</p>
-
-        <div class="spacer-small"></div>
 
         <div class="editor-wrapper">
             
@@ -128,8 +137,6 @@
                     <div id="quoteTextDisplay">Type your text...</div>
                 </div>
             </div>
-
-            <div class="spacer-large"></div>
 
             <div class="controls-section">
                 <label style="color:var(--accent); display:block; margin-bottom:10px;"><b>1. Your Text:</b></label>
@@ -143,8 +150,6 @@
                     <div class="bg-btn" style="background: linear-gradient(to right, #f093fb 0%, #f5576c 100%);" onclick="changeBg(this)"></div>
                 </div>
                 <button class="btn-random" onclick="randomBg()">🎲 Random BG</button>
-                
-                <div class="spacer-small"></div>
                 <button class="btn-save" onclick="saveImage()">📸 Save Image</button>
             </div>
         </div>
