@@ -29,7 +29,7 @@
             gap: 2rem; 
             align-items: start;
             /* ✅ Fix: Added margin to prevent overlapping */
-            margin-top: 2rem; 
+            margin-top: 4rem; 
         }
         
         /* Preview Area */
@@ -114,4 +114,78 @@
                 <label class="label" style="margin-top: 1.5rem;">3. Save & Share:</label>
                 <button class="action-btn btn-save" onclick="saveImage()">📸 Save Image (PNG)</button>
                 <button class="action-btn btn-share" onclick="shareToFb()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>
+                    Share to Facebook
+                </button>
+                <small style="color: #94a3b8; display: block; margin-top: 5px; font-size: 0.8rem;">*Clicking share will open Facebook. Please upload the saved image manually.</small>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️</footer>
+
+    <script>
+        // --- Logic ---
+
+        const quoteInput = document.getElementById('quoteInput');
+        const quoteTextDisplay = document.getElementById('quoteTextDisplay');
+        const captureArea = document.getElementById('captureArea');
+        const bgBtns = document.querySelectorAll('.bg-btn');
+
+        // 1. Real-time update
+        quoteInput.addEventListener('input', function() {
+            quoteTextDisplay.innerText = this.value || 'Type your text here...';
+        });
+
+        // 2. Change Background
+        function changeBg(element) {
+            bgBtns.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            captureArea.style.background = element.style.background;
+        }
+
+        // 3. Random Background
+        function randomBg() {
+            bgBtns.forEach(btn => btn.classList.remove('active'));
+            const color1 = '#' + Math.floor(Math.random()*16777215).toString(16);
+            const color2 = '#' + Math.floor(Math.random()*16777215).toString(16);
+            const deg = Math.floor(Math.random() * 360);
+            const gradient = `linear-gradient(${deg}deg, ${color1}, ${color2})`;
+            captureArea.style.background = gradient;
+        }
+
+        // 4. Save Image
+        function saveImage() {
+            const btn = document.querySelector('.btn-save');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Saving...'; 
+
+            html2canvas(captureArea, {
+                scale: 2, 
+                backgroundColor: null 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'quote-ezgentools.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click(); 
+
+                btn.innerHTML = '✅ Saved!';
+                setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+            }).catch(err => {
+                alert('Error saving image.');
+                btn.innerHTML = originalText;
+            });
+        }
+
+        // 5. Share to FB
+        function shareToFb() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+            
+            // English Tip
+            alert("👉 Tip: The image has been saved to your device!\n\nIn the Facebook window, please click 'Photo/Video' and upload the image you just saved.");
+        }
+    </script>
+
+</body>
+</html>
