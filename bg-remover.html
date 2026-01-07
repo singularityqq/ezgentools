@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (ESM Edition)</title>
+    <title>AI Background Remover (Final Clean)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
     <style>
-        /* 🌑 Dark Theme Styles (คงเดิม) */
+        /* 🌑 Dark Theme Styles */
         body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; box-sizing: border-box; }
         .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid #333; }
         h1 { margin-bottom: 30px; color: #fff; font-weight: 300; letter-spacing: 1px; }
@@ -26,13 +26,8 @@
     <script type="importmap">
     {
         "imports": {
-            /* 1. lodash-es: เวอร์ชั่นสำหรับ Browser โดยเฉพาะ (ไม่มี require) */
             "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm",
-            
-            /* 2. onnxruntime-web: ชี้ไปที่ไฟล์ ES6 (Modern JS) โดยตรง */
             "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.15.1/dist/ort.es6.min.js",
-            
-            /* 3. เพื่อนอื่นๆ: ใช้เวอร์ชั่น +esm ทั้งหมด */
             "ndarray": "https://cdn.jsdelivr.net/npm/ndarray@1.0.19/+esm",
             "zod": "https://cdn.jsdelivr.net/npm/zod@3.23.8/+esm"
         }
@@ -60,7 +55,7 @@
 </div>
 
 <script type="module">
-    // เรียกใช้ไฟล์ Local ของสามี (imgly.js ที่เปลี่ยนชื่อมาจาก index.mjs)
+    // เรียกใช้ไฟล์ Local ของสามี
     import removeBackground from './assets/imgly.js';
 
     const fileInput = document.getElementById('imageInput');
@@ -87,11 +82,10 @@
 
             // --- CONFIG ---
             const config = {
-                // ✅ ชี้เป้าไปที่ Local Assets ของสามี (สำคัญมาก!)
-                // ใช้ new URL เพื่อความแม่นยำ 100% ไม่ว่าจะอยู่ sub-folder ไหน
+                // ✅ Local Assets Path
                 publicPath: new URL('./assets/', window.location.href).toString(),
                 
-                // ✅ ปิด Debug เพื่อความลื่นไหล
+                // ✅ Debug false
                 debug: false, 
                 
                 // ✅ Progress Bar
@@ -103,7 +97,7 @@
                 }
             };
 
-            console.log("🚀 Starting AI with clean ESM dependencies...");
+            console.log("🚀 Starting AI...");
             
             const blob = await removeBackground(imageFile, config);
             
