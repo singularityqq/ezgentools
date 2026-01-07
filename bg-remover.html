@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Background Remover - EzGenTools</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
@@ -35,7 +34,7 @@
         </h1>
 
         <div id="systemCheck" class="mb-6 p-3 rounded-lg text-sm font-mono bg-slate-800 border border-slate-700 inline-block">
-            🤖 System Status: <span id="sysStatus" class="text-yellow-400">Checking AI Engine...</span>
+            🤖 System Status: <span id="sysStatus" class="text-yellow-400 animate-pulse">Connecting to AI Cloud...</span>
         </div>
 
         <div class="bg-slate-800 rounded-2xl p-6 border-2 border-dashed border-slate-600 hover:border-yellow-400 transition cursor-pointer relative" id="dropZone">
@@ -70,48 +69,22 @@
 
     <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com</footer>
 
-    <script>
+    <script type="module">
+        import imglyRemoveBackground from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/+esm";
+
         const imageInput = document.getElementById('imageInput');
         const sysStatus = document.getElementById('sysStatus');
-        const systemCheckBox = document.getElementById('systemCheck');
         const status = document.getElementById('status');
         const resultArea = document.getElementById('resultArea');
         const originalImg = document.getElementById('originalImg');
         const resultImg = document.getElementById('resultImg');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // 🔥 1. เริ่มเช็กระบบทันทีเมื่อเข้าหน้าเว็บ
-        window.onload = function() {
-            // เช็กว่าเปิดผ่าน http/https หรือไม่ (ถ้าเป็น file:// จะพัง)
-            const isLocalFile = window.location.protocol === 'file:';
-            
-            if (isLocalFile) {
-                sysStatus.innerHTML = "❌ ERROR: Cannot run locally!";
-                sysStatus.className = "text-red-400 font-bold";
-                systemCheckBox.innerHTML += "<br><span class='text-xs text-red-300'>Please upload to EzGenTools.com to test.</span>";
-                return;
-            }
-
-            // เช็กว่า Library โหลดมาหรือยัง
-            if (typeof imglyRemoveBackground === 'function') {
-                sysStatus.innerHTML = "✅ Ready to use!";
-                sysStatus.className = "text-green-400 font-bold";
-                imageInput.disabled = false; // ปลดล็อกปุ่ม
-            } else {
-                sysStatus.innerHTML = "⚠️ Library Loading...";
-                // รออีกนิดเผื่อเน็ตช้า
-                setTimeout(() => {
-                    if (typeof imglyRemoveBackground === 'function') {
-                        sysStatus.innerHTML = "✅ Ready!";
-                        sysStatus.className = "text-green-400 font-bold";
-                        imageInput.disabled = false;
-                    } else {
-                        sysStatus.innerHTML = "❌ AI Engine Failed to Load.";
-                        sysStatus.className = "text-red-400";
-                    }
-                }, 2000);
-            }
-        };
+        // ถ้าโค้ดมาถึงตรงนี้ได้ แปลว่า Import สำเร็จ
+        sysStatus.innerHTML = "✅ AI Engine Ready!";
+        sysStatus.className = "text-green-400 font-bold";
+        sysStatus.classList.remove('animate-pulse');
+        imageInput.disabled = false;
 
         imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
@@ -125,15 +98,15 @@
 
             status.classList.remove('hidden');
             status.style.color = '#fbbf24';
-            status.innerHTML = "⏳ Phase 1: Warming up AI (May take 10s)...";
+            status.innerHTML = "⏳ Phase 1: Downloading AI Brain (Wait ~5-10s)...";
 
             try {
-                // Config สำหรับ Server จริง
+                // Config: ชี้เป้าไปที่ Assets Server
                 const config = {
                     publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/",
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
-                        if(percent > 0) status.innerHTML = `⏳ AI Processing: ${percent}%`;
+                        if(percent > 0) status.innerHTML = `⏳ Processing: ${percent}%`;
                     }
                 };
 
@@ -149,7 +122,7 @@
 
             } catch (error) {
                 console.error(error);
-                status.innerHTML = "❌ Failed: " + error.message;
+                status.innerHTML = "❌ Error: " + error.message;
                 status.style.color = 'red';
             }
         });
