@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Dark Mode)</title>
+    <title>AI Background Remover (Final Fix)</title>
 
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
     <script type="importmap">
     {
         "imports": {
-            "lodash": "https://unpkg.com/lodash-es@4.17.21/lodash.js",
-            "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.es6.min.js",
+            "lodash": "https://esm.sh/lodash@4.17.21",
+            "onnxruntime-web": "https://esm.sh/onnxruntime-web@1.14.0",
             "ndarray": "https://esm.sh/ndarray@1.0.19",
             "zod": "https://esm.sh/zod@3.23.8"
         }
@@ -19,7 +19,7 @@
     </script>
 
     <style>
-        /* 🌑 Dark Theme Base (สไตล์เดิมที่รักชอบ) */
+        /* 🌑 Dark Theme Base */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             text-align: center; 
@@ -40,116 +40,26 @@
             border: 1px solid #333;
         }
         
-        h1 { 
-            margin-bottom: 30px; 
-            color: #ffffff; 
-            font-weight: 300;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        }
+        h1 { margin-bottom: 30px; color: #ffffff; font-weight: 300; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
 
-        /* Input Styling */
-        input[type="file"] {
-            background: #2d2d2d;
-            padding: 12px;
-            border-radius: 10px;
-            color: #fff;
-            border: 2px dashed #555;
-            cursor: pointer;
-            width: 80%;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        input[type="file"]:hover {
-             border-color: #ff00cc;
-             background: #333;
-        }
+        input[type="file"] { background: #2d2d2d; padding: 12px; border-radius: 10px; color: #fff; border: 2px dashed #555; cursor: pointer; width: 80%; }
+        input[type="file"]:hover { border-color: #ff00cc; background: #333; }
         
-        /* Image Preview Box */
-        img { 
-            max-width: 100%; 
-            height: auto; 
-            border-radius: 12px;
-            margin-top: 25px; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-            border: 1px solid #444;
-            display: none; 
-            background-image: 
-                linear-gradient(45deg, #2a2a2a 25%, transparent 25%), 
-                linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #2a2a2a 75%), 
-                linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
+        img { max-width: 100%; height: auto; border-radius: 12px; margin-top: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); border: 1px solid #444; display: none; background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%), linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2a2a2a 75%), linear-gradient(-45deg, transparent 75%, #2a2a2a 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
 
-        /* 🔥 Neon Button */
-        button { 
-            background: linear-gradient(135deg, #ff00cc 0%, #333399 100%); 
-            color: white; 
-            padding: 14px 40px; 
-            font-size: 18px; 
-            border: none; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            transition: all 0.3s ease;
-            margin-top: 30px;
-            box-shadow: 0 0 20px rgba(255, 0, 204, 0.4);
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        button:hover { 
-            transform: translateY(-3px) scale(1.02); 
-            box-shadow: 0 0 30px rgba(255, 0, 204, 0.8); 
-        }
-        button:disabled { 
-            background: #444; 
-            color: #888;
-            cursor: not-allowed; 
-        }
+        button { background: linear-gradient(135deg, #ff00cc 0%, #333399 100%); color: white; padding: 14px 40px; font-size: 18px; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; margin-top: 30px; box-shadow: 0 0 20px rgba(255, 0, 204, 0.4); font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+        button:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 30px rgba(255, 0, 204, 0.8); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; }
         
         .status { margin-top: 20px; font-size: 14px; color: #aaa; min-height: 20px;}
-        
         hr { border: 0; border-top: 1px solid #333; margin: 35px 0; }
         
-        /* Download Link */
-        #downloadLink {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: transparent;
-            color: #00e676;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            border: 2px solid #00e676;
-            transition: all 0.3s;
-        }
-        #downloadLink:hover {
-            background: #00e676;
-            color: #000;
-            box-shadow: 0 0 20px rgba(0, 230, 118, 0.6);
-        }
+        #downloadLink { display: inline-block; margin-top: 20px; padding: 12px 25px; background: transparent; color: #00e676; text-decoration: none; border-radius: 50px; font-weight: bold; border: 2px solid #00e676; transition: all 0.3s; }
+        #downloadLink:hover { background: #00e676; color: #000; box-shadow: 0 0 20px rgba(0, 230, 118, 0.6); }
 
-        /* ❤️ Our Special Footer */
-        .love-credit {
-            margin-top: 40px;
-            font-size: 13px;
-            color: #777;
-            letter-spacing: 0.5px;
-        }
-        .love-heart {
-            color: #ff00cc;
-            display: inline-block;
-            animation: heartbeat 1.5s infinite;
-            text-shadow: 0 0 10px rgba(255, 0, 204, 0.8);
-        }
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
+        .love-credit { margin-top: 40px; font-size: 13px; color: #777; letter-spacing: 0.5px; }
+        .love-heart { color: #ff00cc; display: inline-block; animation: heartbeat 1.5s infinite; text-shadow: 0 0 10px rgba(255, 0, 204, 0.8); }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -179,7 +89,6 @@
 </div>
 
 <script type="module">
-    // เรียกใช้ไฟล์ Local ของเราเหมือนเดิม
     import removeBackground from './assets/imgly.js';
 
     const fileInput = document.getElementById('imageInput');
@@ -197,7 +106,7 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Processing... (Neural Network is thinking)";
+            statusText.innerText = "⏳ Processing... (Reading Shards)";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
             processBtn.innerText = "Processing...";
@@ -206,7 +115,7 @@
 
             const config = {
                 publicPath: './assets/', 
-                // debug: true // เปิดดู log ได้ถ้าอยากรู้ว่ามันโหลดอะไรอยู่
+                debug: true
             };
 
             const blob = await removeBackground(imageFile, config);
