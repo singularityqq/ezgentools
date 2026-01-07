@@ -114,7 +114,9 @@
             downloadLink.style.display = "none";
 
             const config = {
-                publicPath: './assets/', 
+          // ✅ ของใหม่: ใส่ชื่อเว็บเต็มๆ ให้มันเลย (เช่น https://ezgentools.com/assets/)
+                publicPath: window.location.origin + '/assets/', 
+                
                 debug: true
             };
 
