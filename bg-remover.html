@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Background Remover - EzGenTools</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
@@ -32,10 +33,13 @@
         <h1 class="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
             Remove Background
         </h1>
-        <p class="text-slate-400 mb-8">100% Free & Private (ES Module Version)</p>
+
+        <div id="systemCheck" class="mb-6 p-3 rounded-lg text-sm font-mono bg-slate-800 border border-slate-700 inline-block">
+            🤖 System Status: <span id="sysStatus" class="text-yellow-400">Checking AI Engine...</span>
+        </div>
 
         <div class="bg-slate-800 rounded-2xl p-6 border-2 border-dashed border-slate-600 hover:border-yellow-400 transition cursor-pointer relative" id="dropZone">
-            <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+            <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" disabled>
             <div class="space-y-4 pointer-events-none">
                 <svg class="w-16 h-16 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 <p class="text-lg font-semibold text-white">Click to Upload Image</p>
@@ -43,7 +47,6 @@
             </div>
         </div>
 
-        <div id="errorBox" class="hidden mt-4 p-4 bg-red-900/50 border border-red-500 rounded text-red-200 text-sm text-left font-mono break-all"></div>
         <div id="status" class="hidden mt-6 text-yellow-400 animate-pulse font-semibold"></div>
 
         <div id="resultArea" class="hidden mt-8">
@@ -67,44 +70,73 @@
 
     <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com</footer>
 
-    <script type="module">
-        // Import จาก CDN ที่แปลงเป็น ES Module ให้แล้ว
-        import imglyRemoveBackground from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/+esm";
-
+    <script>
         const imageInput = document.getElementById('imageInput');
+        const sysStatus = document.getElementById('sysStatus');
+        const systemCheckBox = document.getElementById('systemCheck');
         const status = document.getElementById('status');
         const resultArea = document.getElementById('resultArea');
         const originalImg = document.getElementById('originalImg');
         const resultImg = document.getElementById('resultImg');
         const downloadBtn = document.getElementById('downloadBtn');
-        const errorBox = document.getElementById('errorBox');
+
+        // 🔥 1. เริ่มเช็กระบบทันทีเมื่อเข้าหน้าเว็บ
+        window.onload = function() {
+            // เช็กว่าเปิดผ่าน http/https หรือไม่ (ถ้าเป็น file:// จะพัง)
+            const isLocalFile = window.location.protocol === 'file:';
+            
+            if (isLocalFile) {
+                sysStatus.innerHTML = "❌ ERROR: Cannot run locally!";
+                sysStatus.className = "text-red-400 font-bold";
+                systemCheckBox.innerHTML += "<br><span class='text-xs text-red-300'>Please upload to EzGenTools.com to test.</span>";
+                return;
+            }
+
+            // เช็กว่า Library โหลดมาหรือยัง
+            if (typeof imglyRemoveBackground === 'function') {
+                sysStatus.innerHTML = "✅ Ready to use!";
+                sysStatus.className = "text-green-400 font-bold";
+                imageInput.disabled = false; // ปลดล็อกปุ่ม
+            } else {
+                sysStatus.innerHTML = "⚠️ Library Loading...";
+                // รออีกนิดเผื่อเน็ตช้า
+                setTimeout(() => {
+                    if (typeof imglyRemoveBackground === 'function') {
+                        sysStatus.innerHTML = "✅ Ready!";
+                        sysStatus.className = "text-green-400 font-bold";
+                        imageInput.disabled = false;
+                    } else {
+                        sysStatus.innerHTML = "❌ AI Engine Failed to Load.";
+                        sysStatus.className = "text-red-400";
+                    }
+                }, 2000);
+            }
+        };
 
         imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            errorBox.classList.add('hidden');
+            // Reset UI
             resultArea.classList.add('hidden');
-            
             const reader = new FileReader();
             reader.onload = (e) => originalImg.src = e.target.result;
             reader.readAsDataURL(file);
 
             status.classList.remove('hidden');
             status.style.color = '#fbbf24';
-            status.innerHTML = "⏳ Phase 1: Downloading AI Brain...";
+            status.innerHTML = "⏳ Phase 1: Warming up AI (May take 10s)...";
 
             try {
-                // Config: ใช้ Server หลักของ IMG.LY (เสถียรสุด)
+                // Config สำหรับ Server จริง
                 const config = {
                     publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/",
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
-                        if(percent > 0) status.innerHTML = `⏳ Processing: ${percent}%`;
+                        if(percent > 0) status.innerHTML = `⏳ AI Processing: ${percent}%`;
                     }
                 };
 
-                // เรียกใช้ฟังก์ชันที่ import มา
                 const blob = await imglyRemoveBackground(file, config);
                 const url = URL.createObjectURL(blob);
                 
@@ -117,10 +149,8 @@
 
             } catch (error) {
                 console.error(error);
-                status.innerHTML = "❌ FAILED!";
+                status.innerHTML = "❌ Failed: " + error.message;
                 status.style.color = 'red';
-                errorBox.classList.remove('hidden');
-                errorBox.innerHTML = `<strong>Error:</strong> ${error.message}<br>Tip: ลองใช้รูปอื่น หรือลองใน Chrome/Edge บนคอมพิวเตอร์ดูนะครับ`;
             }
         });
     </script>
