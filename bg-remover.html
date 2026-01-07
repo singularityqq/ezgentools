@@ -3,29 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Final Clean)</title>
+    <title>AI Background Remover (Redemption)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
-    <script>
-        window.global = window;
-        window.process = { env: { NODE_ENV: 'production' }, version: '' };
-    </script>
-
-    <script type="importmap">
-    {
-        "imports": {
-            "lodash": "https://esm.sh/lodash@4.17.21",
-            "onnxruntime-web": "https://esm.sh/onnxruntime-web@1.15.1?bundle",
-            "ndarray": "https://esm.sh/ndarray@1.0.19?bundle",
-            "zod": "https://esm.sh/zod@3.23.8",
-            "buffer": "https://esm.sh/buffer@6.0.3" 
-        }
-    }
-    </script>
-
     <style>
-        /* 🌑 Dark Theme (ดีไซน์เดิม) */
+        /* 🌑 Dark Theme Styles */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; min-height: 100vh; box-sizing: border-box; }
         .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid #333; }
         h1 { margin-bottom: 30px; color: #ffffff; font-weight: 300; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
@@ -43,6 +26,29 @@
         .love-heart { color: #ff00cc; display: inline-block; animation: heartbeat 1.5s infinite; text-shadow: 0 0 10px rgba(255, 0, 204, 0.8); }
         @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
     </style>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "lodash": "https://esm.sh/lodash@4.17.21",
+            "onnxruntime-web": "https://esm.sh/onnxruntime-web@1.15.1?bundle",
+            "ndarray": "https://esm.sh/ndarray@1.0.19?bundle",
+            "zod": "https://esm.sh/zod@3.23.8",
+            "buffer": "https://esm.sh/buffer@6.0.3"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import { Buffer } from 'buffer'; // ดึงมาจาก Import Map
+        
+        // ประกาศให้โลกรู้ (Global) ว่าฉันคือ Buffer!
+        window.Buffer = Buffer;
+        window.global = window;
+        window.process = { env: { NODE_ENV: 'production' }, version: '' };
+        
+        console.log("✅ Global Buffer Force-Loaded:", window.Buffer);
+    </script>
 </head>
 <body>
 
@@ -88,7 +94,7 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Processing... (Warming up AI Brain)";
+            statusText.innerText = "⏳ Processing... (Brain is working)";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
             processBtn.innerText = "Processing...";
@@ -96,7 +102,7 @@
             downloadLink.style.display = "none";
 
             const config = {
-                // ✅ Config เดิมที่ถูกต้องแล้ว
+                // Config
                 publicPath: window.location.origin + '/assets/', 
                 debug: false,
                 progress: (key, current, total) => {
@@ -108,7 +114,6 @@
                 }
             };
 
-            console.log("🚀 Starting AI...");
             const blob = await removeBackground(imageFile, config);
             
             const url = URL.createObjectURL(blob);
@@ -123,7 +128,7 @@
             statusText.style.color = "#00e676"; 
 
         } catch (error) {
-            console.error("Oops! Something went wrong:", error);
+            console.error("Oops!", error);
             statusText.innerText = "❌ Error: " + error.message;
             statusText.style.color = "#ff1744";
         } finally {
