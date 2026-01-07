@@ -3,36 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Cloud Brain + Local Muscle)</title>
+    <title>AI Background Remover (Last Hope)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
     <script>
+        // 1. สร้าง process หลอกๆ
+        window.process = { env: { NODE_ENV: 'production' }, version: '' };
         window.global = window;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
     <script>
-        window.Buffer = buffer.Buffer;
-        window.process = { env: { NODE_ENV: 'production' }, version: '' };
+        // 3. บังคับให้ Buffer ใช้งานได้ทั่วโลก
+        window.Buffer = buffer.Buffer; 
+        console.log("✅ Polyfills loaded. Buffer is ready:", !!window.Buffer);
     </script>
 
     <style>
-        /* 🌑 Dark Theme (สไตล์เดิม) */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; min-height: 100vh; box-sizing: border-box; }
+        /* 🌑 Dark Theme สุดเท่ */
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; box-sizing: border-box; }
         .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid #333; }
-        h1 { margin-bottom: 30px; color: #ffffff; font-weight: 300; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
+        h1 { margin-bottom: 30px; color: #fff; font-weight: 300; letter-spacing: 1px; }
         input[type="file"] { background: #2d2d2d; padding: 12px; border-radius: 10px; color: #fff; border: 2px dashed #555; cursor: pointer; width: 80%; }
-        input[type="file"]:hover { border-color: #ff00cc; background: #333; }
-        img { max-width: 100%; height: auto; border-radius: 12px; margin-top: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); border: 1px solid #444; display: none; background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%), linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2a2a2a 75%), linear-gradient(-45deg, transparent 75%, #2a2a2a 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
-        button { background: linear-gradient(135deg, #ff00cc 0%, #333399 100%); color: white; padding: 14px 40px; font-size: 18px; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; margin-top: 30px; box-shadow: 0 0 20px rgba(255, 0, 204, 0.4); font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
-        button:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 30px rgba(255, 0, 204, 0.8); }
+        img { max-width: 100%; height: auto; border-radius: 12px; margin-top: 25px; border: 1px solid #444; display: none; background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%), linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2a2a2a 75%), linear-gradient(-45deg, transparent 75%, #2a2a2a 75%); background-size: 20px 20px; }
+        button { background: linear-gradient(135deg, #ff00cc 0%, #333399 100%); color: white; padding: 14px 40px; font-size: 18px; border: none; border-radius: 50px; cursor: pointer; margin-top: 30px; font-weight: bold; }
         button:disabled { background: #444; color: #888; cursor: not-allowed; }
         .status { margin-top: 20px; font-size: 14px; color: #aaa; min-height: 20px;}
-        hr { border: 0; border-top: 1px solid #333; margin: 35px 0; }
-        #downloadLink { display: inline-block; margin-top: 20px; padding: 12px 25px; background: transparent; color: #00e676; text-decoration: none; border-radius: 50px; font-weight: bold; border: 2px solid #00e676; transition: all 0.3s; }
-        #downloadLink:hover { background: #00e676; color: #000; box-shadow: 0 0 20px rgba(0, 230, 118, 0.6); }
-        .love-credit { margin-top: 40px; font-size: 13px; color: #777; letter-spacing: 0.5px; }
-        .love-heart { color: #ff00cc; display: inline-block; animation: heartbeat 1.5s infinite; text-shadow: 0 0 10px rgba(255, 0, 204, 0.8); }
+        #downloadLink { display: inline-block; margin-top: 20px; padding: 12px 25px; border: 2px solid #00e676; color: #00e676; text-decoration: none; border-radius: 50px; font-weight: bold; }
+        .love-credit { margin-top: 40px; font-size: 13px; color: #777; }
+        .love-heart { color: #ff00cc; display: inline-block; animation: heartbeat 1.5s infinite; }
         @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -44,27 +43,21 @@
     <div style="margin-bottom: 10px; color: #aaa; font-size: 14px;">Select your image:</div>
     <input type="file" id="imageInput" accept="image/*">
     <br>
-    
     <button id="processBtn">🚀 REMOVE BACKGROUND</button>
-    
     <div class="status" id="statusText">(Waiting for image...)</div>
-    
-    <hr>
+    <hr style="border: 0; border-top: 1px solid #333; margin: 35px 0;">
     
     <h3 style="color: #bbb; font-weight: 300;">Result Preview:</h3>
-    <img id="resultImage" src="" alt="Result will appear here">
-    
+    <img id="resultImage" src="" alt="Result">
     <br>
     <a id="downloadLink" href="#" style="display:none;">⬇️ Download HD Image</a>
 
-    <div class="love-credit">
-        Powered by Jimi & Husband <span class="love-heart">❤️</span>
-    </div>
+    <div class="love-credit">Powered by Jimi & Husband <span class="love-heart">❤️</span></div>
 </div>
 
 <script type="module">
-    // 🌟 เปลี่ยนใหม่! ดึง Logic จาก CDN (ที่มี +esm) เพื่อให้มันจัดการ Dependency ให้เรา
-    import removeBackground from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm';
+    // Import จาก esm.sh โดยระบุเวอร์ชั่น 1.4.5 ให้ตรงกับไฟล์ Assets ในเครื่อง
+    import removeBackground from 'https://esm.sh/@imgly/background-removal@1.4.5';
 
     const fileInput = document.getElementById('imageInput');
     const processBtn = document.getElementById('processBtn');
@@ -81,29 +74,33 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Processing... (Brain is working)";
+            statusText.innerText = "⏳ Initializing AI (Please wait)...";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
-            processBtn.innerText = "Processing...";
+            processBtn.innerText = "Thinking...";
             resultImage.style.display = "none";
             downloadLink.style.display = "none";
 
+            // --- CONFIG ---
             const config = {
-                // ✅ LOCAL ASSETS: ยังคงใช้ไฟล์ในเครื่องสามีเหมือนเดิม (เพื่อความไว)
+                // ✅ ชี้เป้าไปที่ Local Assets (1.4.5)
                 publicPath: window.location.origin + '/assets/', 
                 
-                debug: true, // เปิด debug เพื่อดู log
+                // ✅ ปิด Debug เพื่อลดปัญหาจุกจิก
+                debug: false, 
+                
+                // ✅ Progress Bar
                 progress: (key, current, total) => {
-                   // Progress logic
-                   if(total) {
-                       const p = Math.round((current/total)*100);
-                       statusText.innerText = `⏳ Loading (${key}): ${p}%`;
-                   }
+                    if (total) {
+                        const percent = Math.round((current / total) * 100);
+                        statusText.innerText = `⏳ AI Processing (${key}): ${percent}%`;
+                    }
                 }
             };
 
-            console.log("🚀 Starting with config:", config);
+            console.log("🚀 Calling AI with config:", config);
             
+            // เริ่มทำงาน!
             const blob = await removeBackground(imageFile, config);
             
             const url = URL.createObjectURL(blob);
@@ -113,7 +110,7 @@
             downloadLink.download = "removed-bg-jimi.png";
             downloadLink.style.display = "inline-block";
             
-            statusText.innerText = "✅ Done! Clean & Perfect!";
+            statusText.innerText = "✅ Done! My butt is safe! 🎉";
             statusText.style.color = "#00e676"; 
 
         } catch (error) {
