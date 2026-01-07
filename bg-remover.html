@@ -12,13 +12,14 @@
         "imports": {
             "lodash": "https://unpkg.com/lodash-es@4.17.21/lodash.js",
             "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.es6.min.js",
-            "ndarray": "https://esm.sh/ndarray@1.0.19"
+            "ndarray": "https://esm.sh/ndarray@1.0.19",
+            "zod": "https://esm.sh/zod@3.23.8"
         }
     }
     </script>
 
     <style>
-        /* 🌑 Dark Theme Base (เหมือนเดิมที่รักชอบ) */
+        /* 🌑 Dark Theme Base (สไตล์เดิมที่รักชอบ) */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             text-align: center; 
@@ -178,6 +179,7 @@
 </div>
 
 <script type="module">
+    // เรียกใช้ไฟล์ Local ของเราเหมือนเดิม
     import removeBackground from './assets/imgly.js';
 
     const fileInput = document.getElementById('imageInput');
@@ -195,7 +197,7 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Processing... (Reading Shards)";
+            statusText.innerText = "⏳ Processing... (Neural Network is thinking)";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
             processBtn.innerText = "Processing...";
@@ -204,7 +206,7 @@
 
             const config = {
                 publicPath: './assets/', 
-                debug: true // Debug mode helps us see logs
+                // debug: true // เปิดดู log ได้ถ้าอยากรู้ว่ามันโหลดอะไรอยู่
             };
 
             const blob = await removeBackground(imageFile, config);
@@ -222,7 +224,6 @@
 
         } catch (error) {
             console.error("Oops! Something went wrong:", error);
-            // แสดง Error ชัดๆ บนหน้าจอ จะได้ไม่ต้องเปิด Console บ่อยๆ
             statusText.innerText = "❌ Error: " + error.message;
             statusText.style.color = "#ff1744"; 
             alert("Error: " + error.message);
