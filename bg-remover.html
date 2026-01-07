@@ -35,7 +35,7 @@
     <hr>
     
     <h3>ผลลัพธ์:</h3>
-    <img id="resultImage" src="" alt="รอรูปภาพ...">
+    <img id="resultImage" src="" alt="รอรูปภาพ..." style="max-width: 100%; display: none;">
     <p id="statusText" style="color: gray;">(รอคำสั่ง...)</p>
 </div>
 
@@ -78,8 +78,9 @@
             
             // แปลงก้อนข้อมูล (Blob) เป็นลิงก์รูปภาพ
             const url = URL.createObjectURL(blob);
+           
             resultImage.src = url;
-            
+resultImage.style.display = "block"; // ✨ สั่งให้โชว์ตัวออกมา!
             statusText.innerText = "✅ เรียบร้อย! สวยเช้งวับ!";
             statusText.style.color = "green";
 
