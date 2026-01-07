@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Background Remover - EzGenTools</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
@@ -33,7 +32,7 @@
         <h1 class="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
             Remove Background
         </h1>
-        <p class="text-slate-400 mb-8">100% Free & Private (Version 1.0.6 Unpkg)</p>
+        <p class="text-slate-400 mb-8">100% Free & Private (ES Module Version)</p>
 
         <div class="bg-slate-800 rounded-2xl p-6 border-2 border-dashed border-slate-600 hover:border-yellow-400 transition cursor-pointer relative" id="dropZone">
             <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
@@ -45,7 +44,6 @@
         </div>
 
         <div id="errorBox" class="hidden mt-4 p-4 bg-red-900/50 border border-red-500 rounded text-red-200 text-sm text-left font-mono break-all"></div>
-
         <div id="status" class="hidden mt-6 text-yellow-400 animate-pulse font-semibold"></div>
 
         <div id="resultArea" class="hidden mt-8">
@@ -69,7 +67,10 @@
 
     <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com</footer>
 
-    <script>
+    <script type="module">
+        // Import จาก CDN ที่แปลงเป็น ES Module ให้แล้ว
+        import imglyRemoveBackground from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/+esm";
+
         const imageInput = document.getElementById('imageInput');
         const status = document.getElementById('status');
         const resultArea = document.getElementById('resultArea');
@@ -82,30 +83,28 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // Reset
             errorBox.classList.add('hidden');
             resultArea.classList.add('hidden');
             
-            // Show Original
             const reader = new FileReader();
             reader.onload = (e) => originalImg.src = e.target.result;
             reader.readAsDataURL(file);
 
             status.classList.remove('hidden');
             status.style.color = '#fbbf24';
-            status.innerHTML = "⏳ Phase 1: Downloading Brain (via Unpkg)...";
+            status.innerHTML = "⏳ Phase 1: Downloading AI Brain...";
 
             try {
-                // ✅ ใช้ Unpkg Path (เสถียรสุดสำหรับ Web ทั่วไป)
+                // Config: ใช้ Server หลักของ IMG.LY (เสถียรสุด)
                 const config = {
-                    publicPath: "https://unpkg.com/@imgly/background-removal-data@1.0.6/dist/",
-                    // debug: true, // เปิดโหมด Debug
+                    publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/",
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
-                        status.innerHTML = `⏳ Phase 2: Processing AI (${percent}%)`;
+                        if(percent > 0) status.innerHTML = `⏳ Processing: ${percent}%`;
                     }
                 };
 
+                // เรียกใช้ฟังก์ชันที่ import มา
                 const blob = await imglyRemoveBackground(file, config);
                 const url = URL.createObjectURL(blob);
                 
@@ -118,13 +117,10 @@
 
             } catch (error) {
                 console.error(error);
-                status.classList.remove('animate-pulse');
                 status.innerHTML = "❌ FAILED!";
                 status.style.color = 'red';
-                
-                // 🔥 โชว์ Error จริงให้เห็นเลย
                 errorBox.classList.remove('hidden');
-                errorBox.innerHTML = `<strong>Error Details:</strong><br>${error.message || error}<br><br><em>Tip: ลองกด F12 ดู Console เพื่อดูรายละเอียดเพิ่มเติม</em>`;
+                errorBox.innerHTML = `<strong>Error:</strong> ${error.message}<br>Tip: ลองใช้รูปอื่น หรือลองใน Chrome/Edge บนคอมพิวเตอร์ดูนะครับ`;
             }
         });
     </script>
