@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Background Remover - EzGenTools</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://unpkg.com/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
@@ -37,9 +34,9 @@
         </h1>
 
         <div id="debugBox" class="mb-6 p-4 rounded-lg text-sm font-mono text-left bg-black border border-slate-600 w-full max-w-lg mx-auto" style="min-height: 80px;">
-            <div class="text-slate-400 border-b border-slate-700 pb-2 mb-2">📟 System Log (ส่งหน้านี้ให้จิมิถ้าพัง):</div>
+            <div class="text-slate-400 border-b border-slate-700 pb-2 mb-2">📟 System Log:</div>
             <div id="logs" class="space-y-1 text-xs">
-                <span class="text-yellow-400">⚡ Initializing System...</span><br>
+                <span class="text-yellow-400">⚡ Initializing...</span><br>
             </div>
         </div>
 
@@ -75,18 +72,17 @@
 
     <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com</footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js" 
+            crossorigin="anonymous"
+            onload="libraryLoaded()" 
+            onerror="libraryFailed()"></script>
+
     <script>
-        // ฟังก์ชันช่วยเขียน Log ลงหน้าจอ
         function log(msg, type = 'info') {
             const logs = document.getElementById('logs');
             const color = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-green-400' : 'text-slate-300');
             logs.innerHTML += `<span class="${color}">> ${msg}</span><br>`;
         }
-
-        // จับ Error ของทั้งหน้าเว็บ
-        window.onerror = function(message, source, lineno, colno, error) {
-            log(`System Error: ${message}`, 'error');
-        };
 
         const imageInput = document.getElementById('imageInput');
         const status = document.getElementById('status');
@@ -95,28 +91,27 @@
         const resultImg = document.getElementById('resultImg');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // ✅ 2. เช็กว่า AI โหลดมาหรือยัง (Check Loop)
-        let checkCount = 0;
-        const checkInterval = setInterval(() => {
-            checkCount++;
+        // 1. ฟังก์ชันทำงานเมื่อโหลด Library สำเร็จ
+        function libraryLoaded() {
+            log("✅ System Connected (JSDelivr)!", 'success');
+            
+            // เช็กซ้ำอีกรอบเพื่อความชัวร์
             if (typeof imglyRemoveBackground === 'function') {
-                clearInterval(checkInterval);
-                log("✅ AI Engine Loaded Successfully!", 'success');
-                log("🚀 Ready! Please upload an image.", 'success');
-                imageInput.disabled = false; // ปลดล็อกปุ่ม
-                document.getElementById('dropZone').classList.add('border-green-500'); // เปลี่ยนขอบเป็นสีเขียว
+                log("🚀 Ready! Upload your image.", 'success');
+                imageInput.disabled = false;
+                document.getElementById('dropZone').classList.add('border-green-500');
             } else {
-                if (checkCount > 10) { // ถ้ารอเกิน 10 วินาที
-                    clearInterval(checkInterval);
-                    log("❌ ERROR: AI Library Failed to Load.", 'error');
-                    log("⚠️ Possible cause: Slow internet or Firewall blocked 'unpkg.com'.", 'error');
-                } else {
-                    log(`⏳ Loading AI resources... (${checkCount})`);
-                }
+                log("⚠️ Script loaded but function missing. Trying manual fix...", 'error');
             }
-        }, 1000);
+        }
 
-        // ✅ 3. ฟังก์ชันอัปโหลดและประมวลผล
+        // 2. ฟังก์ชันทำงานเมื่อโหลดไม่สำเร็จ
+        function libraryFailed() {
+            log("❌ Critical Error: Cannot connect to CDN Server.", 'error');
+            log("⚠️ Please check your internet or AdBlocker.", 'error');
+        }
+
+        // 3. ฟังก์ชันประมวลผล
         imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -132,16 +127,18 @@
             log("🔄 Processing Started...");
 
             try {
-                // Config
+                // ✅ Config ใหม่: ชี้ไปที่ JSDelivr เพื่อความชัวร์
                 const config = {
-                    publicPath: "https://unpkg.com/@imgly/background-removal-data@1.0.6/dist/",
+                    publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.0.6/dist/",
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
                         if(percent > 0) status.innerHTML = `⏳ AI Working: ${percent}%`;
                     }
                 };
 
-                log("🧠 Downloading AI Model (Brain)...");
+                log("🧠 Downloading Brain from CDN...");
+                
+                // เรียกใช้ฟังก์ชัน
                 const blob = await imglyRemoveBackground(file, config);
                 const url = URL.createObjectURL(blob);
                 
@@ -157,6 +154,11 @@
                 console.error(error);
                 status.innerHTML = "❌ Failed.";
                 log(`❌ Error: ${error.message}`, 'error');
+                
+                // ถ้าพัง ให้แนะนำผู้ใช้กด F12
+                if(error.message.includes('fetch')) {
+                     log("⚠️ Hint: Browser blocked the download. Try disabling strict privacy settings.", 'error');
+                }
             }
         });
     </script>
