@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Background Remover - EzGenTools</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.4/dist/imgly-background-removal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
@@ -44,9 +44,7 @@
             </div>
         </div>
 
-        <div id="status" class="hidden mt-6 text-yellow-400 animate-pulse font-semibold">
-            ⏳ Processing... (First time may take 5-10 seconds)
-        </div>
+        <div id="status" class="hidden mt-6 text-yellow-400 animate-pulse font-semibold"></div>
 
         <div id="resultArea" class="hidden mt-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -67,9 +65,7 @@
         </div>
     </div>
 
-    <footer class="mt-12 text-slate-600 text-sm pb-4">
-        &copy; 2026 EzGenTools.com | Powered by AI
-    </footer>
+    <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com | Powered by AI</footer>
 
     <script>
         const imageInput = document.getElementById('imageInput');
@@ -79,36 +75,33 @@
         const resultImg = document.getElementById('resultImg');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // ฟังก์ชันสำหรับโหลดรูปตัวอย่าง
         imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // 1. โชว์รูปต้นฉบับก่อน
             const reader = new FileReader();
             reader.onload = (e) => originalImg.src = e.target.result;
             reader.readAsDataURL(file);
 
-            // 2. เริ่มกระบวนการลบพื้นหลัง
             status.classList.remove('hidden');
-            status.innerHTML = "⏳ Initializing AI Model... (Downloading Brain...)";
+            status.style.color = '#fbbf24'; // Yellow
+            status.innerHTML = "⏳ Downloading AI Brain (First time takes 10s)...";
             resultArea.classList.add('hidden');
 
             try {
-                // 🔥 แก้ตรงนี้! บอกลายแทงให้น้องรู้ว่าต้องโหลดสมองจากไหน
+                // ✅ แก้ไข: ใช้ Server ของผู้พัฒนาโดยตรง (static.img.ly) แทน jsdelivr
+                // ซึ่งจะช่วยแก้ปัญหา Browser บล็อกไฟล์ได้
                 const config = {
-                    publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.4/dist/", // ชี้เป้าไปที่คลังแสง
+                    publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/",
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
-                        status.innerHTML = `⏳ Processing: ${percent}%`;
+                        if(percent > 0) status.innerHTML = `⏳ Processing: ${percent}%`;
                     }
                 };
 
-                // รัน AI
                 const blob = await imglyRemoveBackground(file, config);
-
-                // 3. เสร็จแล้ว! โชว์รูป
                 const url = URL.createObjectURL(blob);
+                
                 resultImg.src = url;
                 downloadBtn.href = url;
                 downloadBtn.download = 'ezgen-nocom.png';
@@ -117,10 +110,11 @@
                 resultArea.classList.remove('hidden');
 
             } catch (error) {
-                console.error(error); // ดู Error จริงๆ ใน Console (กด F12)
-                status.innerHTML = "❌ Error! ลองเปลี่ยนรูป หรือเช็กอินเทอร์เน็ตดูนะคะ";
+                console.error(error);
                 status.classList.remove('animate-pulse');
-                status.style.color = 'red';
+                status.style.color = '#ef4444'; // Red
+                // แจ้งเตือนแบบละเอียดขึ้น
+                status.innerHTML = "❌ Error! ถ้ายังไม่ได้: ลองใช้ Browser อื่น (Chrome/Edge) หรือใช้รูปที่ขนาดเล็กลงหน่อยนะคะ";
             }
         });
     </script>
