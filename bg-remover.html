@@ -116,16 +116,16 @@
                 try {
                     // 🔥 2. แก้ตรงนี้! เปลี่ยนไปใช้ UNPKG สำหรับโหลดไฟล์ Data
                     // UNPKG ใจดีเรื่อง CORS มากกว่า static.img.ly เยอะ
-             // 🔥 แก้ไขแล้ว: เปลี่ยนจาก UNPKG เป็น jsDelivr (เสถียรกว่า เร็วกว่า!)
+// 🔥 แก้รอบที่ 3: ใช้ Server หลักของเจ้าของไลบรารีเลย (ชัวร์สุด!)
                     const config = {
-                        publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.0.6/dist/", 
+                        publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/", 
                         progress: (key, current, total) => {
                             const percent = Math.round((current / total) * 100);
                             if(percent > 0) status.innerHTML = `⏳ AI Processing: ${percent}%`;
                         }
                     };
 
-                    log("🧠 Downloading Brain from jsDelivr (Fast & Stable)...");
+                    log("🧠 Downloading Brain from Official Server (static.img.ly)...");
                     
                     const blob = await imglyRemoveBackground(file, config);
                     const url = URL.createObjectURL(blob);
