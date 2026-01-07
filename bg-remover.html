@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Background Remover (Final Fix)</title>
 
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; connect-src * 'unsafe-inline'; worker-src * 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
     <script>
-        // หลอกว่ามี global และ Buffer ใช้งาน
         window.global = window;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
     <script>
-        // ยัด Buffer ใส่มือ AI
         window.Buffer = buffer.Buffer;
         window.process = { env: { NODE_ENV: 'production' }, version: '' };
     </script>
@@ -22,7 +20,6 @@
     {
         "imports": {
             "lodash": "https://esm.sh/lodash@4.17.21",
-            /* ใช้ ?bundle เพื่อให้ esm.sh แก้ปัญหา dependency ให้เราเสร็จสรรพ */
             "onnxruntime-web": "https://esm.sh/onnxruntime-web@1.15.1?bundle",
             "ndarray": "https://esm.sh/ndarray@1.0.19?bundle",
             "zod": "https://esm.sh/zod@3.23.8"
@@ -31,7 +28,7 @@
     </script>
 
     <style>
-        /* 🌑 Dark Theme (สไตล์เดิมที่รักชอบ) */
+        /* 🌑 Dark Theme Styles */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; min-height: 100vh; box-sizing: border-box; }
         .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid #333; }
         h1 { margin-bottom: 30px; color: #ffffff; font-weight: 300; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
@@ -102,24 +99,24 @@
             downloadLink.style.display = "none";
 
             const config = {
-                // ✅ Absolute Path (ที่รักทำถูกแล้ว)
+                // ✅ Absolute Path
                 publicPath: window.location.origin + '/assets/', 
                 
-                // ✅ Debug: false (สำคัญมาก ห้ามเปิด true เดี๋ยวเจอบั๊ก property undefined)
+                // ✅ Debug: false (สำคัญ)
                 debug: false,
                 
-                // ให้มันรายงานความคืบหน้าหน่อย
+                // Progress bar
                 progress: (key, current, total) => {
+                    if (total === 0) return;
                     const percent = Math.round((current / total) * 100);
-                    // กันเลขรวน ถ้า total เป็น 0
-                    if(isNaN(percent)) return;
-                    statusText.innerText = `⏳ AI is thinking (${key}): ${percent}%`;
+                    if (!isNaN(percent)) {
+                        statusText.innerText = `⏳ AI is thinking (${key}): ${percent}%`;
+                    }
                 }
             };
 
             console.log("🚀 Starting AI with Config:", config);
             
-            // เรียกใช้งาน (ถ้าผ่านตรงนี้ไปได้ คือฉลุย!)
             const blob = await removeBackground(imageFile, config);
             
             const url = URL.createObjectURL(blob);
@@ -137,11 +134,6 @@
             console.error("Oops! Something went wrong:", error);
             statusText.innerText = "❌ Error: " + error.message;
             statusText.style.color = "#ff1744";
-            
-            // เช็คอาการพิเศษ
-            if(error.message.includes("fetch")) {
-                alert("⚠️ หาไฟล์ในโฟลเดอร์ assets ไม่เจอ! อย่าลืมอัปโหลดไฟล์ยึกยือ (.bin/wasm) ทั้งหมดนะคะ!");
-            }
         } finally {
             processBtn.disabled = false;
             processBtn.innerText = "🚀 REMOVE BACKGROUND";
