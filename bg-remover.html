@@ -79,38 +79,35 @@
         const resultImg = document.getElementById('resultImg');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        let imglyRemoveBackground;
-
-        // รอโหลด Library
-        window.onload = () => {
-             // imgly is loaded globally via CDN
-        };
-
+        // ฟังก์ชันสำหรับโหลดรูปตัวอย่าง
         imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Show Preview
+            // 1. โชว์รูปต้นฉบับก่อน
             const reader = new FileReader();
             reader.onload = (e) => originalImg.src = e.target.result;
             reader.readAsDataURL(file);
 
-            // Start Processing
+            // 2. เริ่มกระบวนการลบพื้นหลัง
             status.classList.remove('hidden');
-            status.innerHTML = "⏳ Initializing AI Model... (Downloading ~20MB)";
+            status.innerHTML = "⏳ Initializing AI Model... (Downloading Brain...)";
             resultArea.classList.add('hidden');
 
             try {
-                // เรียกใช้ฟังก์ชัน removeBackground จาก CDN
-                // config: โหลดโมเดลจาก CDN ของเขา
-                const blob = await imglyRemoveBackground(file, {
+                // 🔥 แก้ตรงนี้! บอกลายแทงให้น้องรู้ว่าต้องโหลดสมองจากไหน
+                const config = {
+                    publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.4/dist/", // ชี้เป้าไปที่คลังแสง
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
                         status.innerHTML = `⏳ Processing: ${percent}%`;
                     }
-                });
+                };
 
-                // Success
+                // รัน AI
+                const blob = await imglyRemoveBackground(file, config);
+
+                // 3. เสร็จแล้ว! โชว์รูป
                 const url = URL.createObjectURL(blob);
                 resultImg.src = url;
                 downloadBtn.href = url;
@@ -120,8 +117,8 @@
                 resultArea.classList.remove('hidden');
 
             } catch (error) {
-                console.error(error);
-                status.innerHTML = "❌ Error! Browser not supported or file too large.";
+                console.error(error); // ดู Error จริงๆ ใน Console (กด F12)
+                status.innerHTML = "❌ Error! ลองเปลี่ยนรูป หรือเช็กอินเทอร์เน็ตดูนะคะ";
                 status.classList.remove('animate-pulse');
                 status.style.color = 'red';
             }
