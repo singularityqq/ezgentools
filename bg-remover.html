@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Background Remover - EzGenTools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.4/dist/imgly-background-removal.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
+        .checkerboard {
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #ccc 75%), 
+                              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <nav class="w-full fixed top-0 bg-slate-900/90 backdrop-blur border-b border-slate-700 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-white">EzGen<span class="text-yellow-400">Tools</span></a>
+            <a href="index.html" class="text-sm text-slate-400 hover:text-white">Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="mt-20 text-center max-w-2xl w-full">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
+            Remove Background
+        </h1>
+        <p class="text-slate-400 mb-8">100% Free & Private. Processing happens on your device.</p>
+
+        <div class="bg-slate-800 rounded-2xl p-6 border-2 border-dashed border-slate-600 hover:border-yellow-400 transition cursor-pointer relative" id="dropZone">
+            <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+            <div class="space-y-4 pointer-events-none">
+                <svg class="w-16 h-16 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <p class="text-lg font-semibold text-white">Click to Upload Image</p>
+                <p class="text-sm text-slate-500">or drop file here</p>
+            </div>
+        </div>
+
+        <div id="status" class="hidden mt-6 text-yellow-400 animate-pulse font-semibold">
+            ⏳ Processing... (First time may take 5-10 seconds)
+        </div>
+
+        <div id="resultArea" class="hidden mt-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="mb-2 text-sm text-slate-400">Original</p>
+                    <img id="originalImg" class="w-full rounded-lg border border-slate-700">
+                </div>
+                <div>
+                    <p class="mb-2 text-sm text-slate-400">Result (Transparent)</p>
+                    <div class="checkerboard rounded-lg overflow-hidden border border-slate-700">
+                        <img id="resultImg" class="w-full">
+                    </div>
+                </div>
+            </div>
+            <a id="downloadBtn" class="block w-full mt-6 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-6 rounded-xl transition transform hover:scale-105">
+                ⬇️ Download HD Image
+            </a>
+        </div>
+    </div>
+
+    <footer class="mt-12 text-slate-600 text-sm pb-4">
+        &copy; 2026 EzGenTools.com | Powered by AI
+    </footer>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const status = document.getElementById('status');
+        const resultArea = document.getElementById('resultArea');
+        const originalImg = document.getElementById('originalImg');
+        const resultImg = document.getElementById('resultImg');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let imglyRemoveBackground;
+
+        // รอโหลด Library
+        window.onload = () => {
+             // imgly is loaded globally via CDN
+        };
+
+        imageInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show Preview
+            const reader = new FileReader();
+            reader.onload = (e) => originalImg.src = e.target.result;
+            reader.readAsDataURL(file);
+
+            // Start Processing
+            status.classList.remove('hidden');
+            status.innerHTML = "⏳ Initializing AI Model... (Downloading ~20MB)";
+            resultArea.classList.add('hidden');
+
+            try {
+                // เรียกใช้ฟังก์ชัน removeBackground จาก CDN
+                // config: โหลดโมเดลจาก CDN ของเขา
+                const blob = await imglyRemoveBackground(file, {
+                    progress: (key, current, total) => {
+                        const percent = Math.round((current / total) * 100);
+                        status.innerHTML = `⏳ Processing: ${percent}%`;
+                    }
+                });
+
+                // Success
+                const url = URL.createObjectURL(blob);
+                resultImg.src = url;
+                downloadBtn.href = url;
+                downloadBtn.download = 'ezgen-nocom.png';
+
+                status.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+
+            } catch (error) {
+                console.error(error);
+                status.innerHTML = "❌ Error! Browser not supported or file too large.";
+                status.classList.remove('animate-pulse');
+                status.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>
