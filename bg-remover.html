@@ -36,7 +36,7 @@
         <div id="debugBox" class="mb-6 p-4 rounded-lg text-sm font-mono text-left bg-black border border-slate-600 w-full max-w-lg mx-auto" style="min-height: 80px;">
             <div class="text-slate-400 border-b border-slate-700 pb-2 mb-2">📟 System Log:</div>
             <div id="logs" class="space-y-1 text-xs">
-                <span class="text-yellow-400">⚡ Initializing via Smart CDN...</span><br>
+                <span class="text-yellow-400">⚡ Initializing Hybrid System...</span><br>
             </div>
         </div>
 
@@ -73,41 +73,36 @@
     <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com</footer>
 
     <script type="module">
-        // ฟังก์ชัน Log (สร้างใหม่ใน scope นี้)
         function log(msg, type = 'info') {
             const logs = document.getElementById('logs');
             const color = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-green-400' : 'text-slate-300');
             logs.innerHTML += `<span class="${color}">> ${msg}</span><br>`;
         }
 
-        log("🔄 Importing Library from esm.sh...");
+        log("🔄 Phase 1: Importing Engine from esm.sh...");
 
         try {
-            // 🔥 Import จาก Smart CDN (แก้ปัญหา 403/File Not Found)
-            // default import จะดึงตัวที่ถูกต้องให้อัตโนมัติ
+            // 1. โหลดตัวโค้ดหลัก (อันนี้ผ่านแล้ว)
             const module = await import("https://esm.sh/@imgly/background-removal@1.0.6");
-            const imglyRemoveBackground = module.default; // ดึงฟังก์ชันหลักออกมา
+            const imglyRemoveBackground = module.default;
 
-            log("✅ Library Imported Successfully!", "success");
+            log("✅ Engine Ready! Unlock UI...", "success");
             
-            // ปลดล็อกหน้าจอ
             const imageInput = document.getElementById('imageInput');
             imageInput.disabled = false;
             document.getElementById('dropZone').classList.add('border-green-500');
-            log("🚀 Ready! System Operational.", "success");
 
-            // Setup ตัวแปรอื่นๆ
             const status = document.getElementById('status');
             const resultArea = document.getElementById('resultArea');
             const originalImg = document.getElementById('originalImg');
             const resultImg = document.getElementById('resultImg');
             const downloadBtn = document.getElementById('downloadBtn');
 
-            // เริ่มการทำงานเมื่อเลือกรูป
             imageInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
+                // UI Reset
                 resultArea.classList.add('hidden');
                 const reader = new FileReader();
                 reader.onload = (e) => originalImg.src = e.target.result;
@@ -115,20 +110,22 @@
 
                 status.classList.remove('hidden');
                 status.style.color = '#fbbf24';
-                status.innerHTML = "⏳ Phase 1: Warming up AI...";
+                status.innerHTML = "⏳ Phase 2: Connecting to Asset Server...";
                 log("🔄 Processing Started...");
 
                 try {
-                    // Config: ชี้เป้าไปที่ Official Assets (อันนี้ห้ามแก้)
+                    // 🔥 2. แก้ตรงนี้! เปลี่ยนไปใช้ UNPKG สำหรับโหลดไฟล์ Data
+                    // UNPKG ใจดีเรื่อง CORS มากกว่า static.img.ly เยอะ
                     const config = {
-                        publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/",
+                        publicPath: "https://unpkg.com/@imgly/background-removal-data@1.0.6/dist/",
                         progress: (key, current, total) => {
                             const percent = Math.round((current / total) * 100);
-                            if(percent > 0) status.innerHTML = `⏳ AI Working: ${percent}%`;
+                            if(percent > 0) status.innerHTML = `⏳ AI Processing: ${percent}%`;
                         }
                     };
 
-                    log("🧠 Downloading Brain Data...");
+                    log("🧠 Downloading Brain from UNPKG (CORS Friendly)...");
+                    
                     const blob = await imglyRemoveBackground(file, config);
                     const url = URL.createObjectURL(blob);
                     
@@ -138,19 +135,22 @@
 
                     status.classList.add('hidden');
                     resultArea.classList.remove('hidden');
-                    log("✨ Success! Background Removed.", "success");
+                    log("✨ SUCCESS! Mission Accomplished.", "success");
 
                 } catch (err) {
                     console.error(err);
                     status.innerHTML = "❌ Failed.";
                     log(`❌ Error: ${err.message}`, 'error');
+                    
+                    if(err.message.includes('fetch')) {
+                        log("⚠️ Tip: ถ้ายังไม่ได้ อาจเป็นเพราะเน็ตบล็อกไฟล์แปลกปลอม ลองปิด AdBlock หรือเปลี่ยนเน็ตดูนะครับ", 'error');
+                    }
                 }
             });
 
         } catch (error) {
             console.error(error);
-            log(`❌ CRITICAL IMPORT ERROR: ${error.message}`, 'error');
-            log("⚠️ Check internet connection.", 'error');
+            log(`❌ CRITICAL ERROR: ${error.message}`, 'error');
         }
     </script>
 </body>
