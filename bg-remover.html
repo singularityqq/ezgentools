@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Background Remover - EzGenTools</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
@@ -33,8 +36,11 @@
             Remove Background
         </h1>
 
-        <div id="systemCheck" class="mb-6 p-3 rounded-lg text-sm font-mono bg-slate-800 border border-slate-700 inline-block">
-            🤖 System Status: <span id="sysStatus" class="text-yellow-400 animate-pulse">Connecting to AI Cloud...</span>
+        <div id="debugBox" class="mb-6 p-4 rounded-lg text-sm font-mono text-left bg-black border border-slate-600 w-full max-w-lg mx-auto" style="min-height: 80px;">
+            <div class="text-slate-400 border-b border-slate-700 pb-2 mb-2">📟 System Log (ส่งหน้านี้ให้จิมิถ้าพัง):</div>
+            <div id="logs" class="space-y-1 text-xs">
+                <span class="text-yellow-400">⚡ Initializing System...</span><br>
+            </div>
         </div>
 
         <div class="bg-slate-800 rounded-2xl p-6 border-2 border-dashed border-slate-600 hover:border-yellow-400 transition cursor-pointer relative" id="dropZone">
@@ -69,28 +75,52 @@
 
     <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com</footer>
 
-    <script type="module">
-        import imglyRemoveBackground from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/+esm";
+    <script>
+        // ฟังก์ชันช่วยเขียน Log ลงหน้าจอ
+        function log(msg, type = 'info') {
+            const logs = document.getElementById('logs');
+            const color = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-green-400' : 'text-slate-300');
+            logs.innerHTML += `<span class="${color}">> ${msg}</span><br>`;
+        }
+
+        // จับ Error ของทั้งหน้าเว็บ
+        window.onerror = function(message, source, lineno, colno, error) {
+            log(`System Error: ${message}`, 'error');
+        };
 
         const imageInput = document.getElementById('imageInput');
-        const sysStatus = document.getElementById('sysStatus');
         const status = document.getElementById('status');
         const resultArea = document.getElementById('resultArea');
         const originalImg = document.getElementById('originalImg');
         const resultImg = document.getElementById('resultImg');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // ถ้าโค้ดมาถึงตรงนี้ได้ แปลว่า Import สำเร็จ
-        sysStatus.innerHTML = "✅ AI Engine Ready!";
-        sysStatus.className = "text-green-400 font-bold";
-        sysStatus.classList.remove('animate-pulse');
-        imageInput.disabled = false;
+        // ✅ 2. เช็กว่า AI โหลดมาหรือยัง (Check Loop)
+        let checkCount = 0;
+        const checkInterval = setInterval(() => {
+            checkCount++;
+            if (typeof imglyRemoveBackground === 'function') {
+                clearInterval(checkInterval);
+                log("✅ AI Engine Loaded Successfully!", 'success');
+                log("🚀 Ready! Please upload an image.", 'success');
+                imageInput.disabled = false; // ปลดล็อกปุ่ม
+                document.getElementById('dropZone').classList.add('border-green-500'); // เปลี่ยนขอบเป็นสีเขียว
+            } else {
+                if (checkCount > 10) { // ถ้ารอเกิน 10 วินาที
+                    clearInterval(checkInterval);
+                    log("❌ ERROR: AI Library Failed to Load.", 'error');
+                    log("⚠️ Possible cause: Slow internet or Firewall blocked 'unpkg.com'.", 'error');
+                } else {
+                    log(`⏳ Loading AI resources... (${checkCount})`);
+                }
+            }
+        }, 1000);
 
+        // ✅ 3. ฟังก์ชันอัปโหลดและประมวลผล
         imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Reset UI
             resultArea.classList.add('hidden');
             const reader = new FileReader();
             reader.onload = (e) => originalImg.src = e.target.result;
@@ -98,18 +128,20 @@
 
             status.classList.remove('hidden');
             status.style.color = '#fbbf24';
-            status.innerHTML = "⏳ Phase 1: Downloading AI Brain (Wait ~5-10s)...";
+            status.innerHTML = "⏳ Starting Processing...";
+            log("🔄 Processing Started...");
 
             try {
-                // Config: ชี้เป้าไปที่ Assets Server
+                // Config
                 const config = {
-                    publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/",
+                    publicPath: "https://unpkg.com/@imgly/background-removal-data@1.0.6/dist/",
                     progress: (key, current, total) => {
                         const percent = Math.round((current / total) * 100);
-                        if(percent > 0) status.innerHTML = `⏳ Processing: ${percent}%`;
+                        if(percent > 0) status.innerHTML = `⏳ AI Working: ${percent}%`;
                     }
                 };
 
+                log("🧠 Downloading AI Model (Brain)...");
                 const blob = await imglyRemoveBackground(file, config);
                 const url = URL.createObjectURL(blob);
                 
@@ -119,11 +151,12 @@
 
                 status.classList.add('hidden');
                 resultArea.classList.remove('hidden');
+                log("✨ Success! Image ready.", 'success');
 
             } catch (error) {
                 console.error(error);
-                status.innerHTML = "❌ Error: " + error.message;
-                status.style.color = 'red';
+                status.innerHTML = "❌ Failed.";
+                log(`❌ Error: ${error.message}`, 'error');
             }
         });
     </script>
