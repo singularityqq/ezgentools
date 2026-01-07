@@ -36,7 +36,7 @@
         <div id="debugBox" class="mb-6 p-4 rounded-lg text-sm font-mono text-left bg-black border border-slate-600 w-full max-w-lg mx-auto" style="min-height: 80px;">
             <div class="text-slate-400 border-b border-slate-700 pb-2 mb-2">📟 System Log:</div>
             <div id="logs" class="space-y-1 text-xs">
-                <span class="text-yellow-400">⚡ Initializing...</span><br>
+                <span class="text-yellow-400">⚡ Initializing via Smart CDN...</span><br>
             </div>
         </div>
 
@@ -72,95 +72,86 @@
 
     <footer class="mt-12 text-slate-600 text-sm pb-4">&copy; 2026 EzGenTools.com</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.6/dist/imgly-background-removal.min.js" 
-            crossorigin="anonymous"
-            onload="libraryLoaded()" 
-            onerror="libraryFailed()"></script>
-
-    <script>
+    <script type="module">
+        // ฟังก์ชัน Log (สร้างใหม่ใน scope นี้)
         function log(msg, type = 'info') {
             const logs = document.getElementById('logs');
             const color = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-green-400' : 'text-slate-300');
             logs.innerHTML += `<span class="${color}">> ${msg}</span><br>`;
         }
 
-        const imageInput = document.getElementById('imageInput');
-        const status = document.getElementById('status');
-        const resultArea = document.getElementById('resultArea');
-        const originalImg = document.getElementById('originalImg');
-        const resultImg = document.getElementById('resultImg');
-        const downloadBtn = document.getElementById('downloadBtn');
+        log("🔄 Importing Library from esm.sh...");
 
-        // 1. ฟังก์ชันทำงานเมื่อโหลด Library สำเร็จ
-        function libraryLoaded() {
-            log("✅ System Connected (JSDelivr)!", 'success');
+        try {
+            // 🔥 Import จาก Smart CDN (แก้ปัญหา 403/File Not Found)
+            // default import จะดึงตัวที่ถูกต้องให้อัตโนมัติ
+            const module = await import("https://esm.sh/@imgly/background-removal@1.0.6");
+            const imglyRemoveBackground = module.default; // ดึงฟังก์ชันหลักออกมา
+
+            log("✅ Library Imported Successfully!", "success");
             
-            // เช็กซ้ำอีกรอบเพื่อความชัวร์
-            if (typeof imglyRemoveBackground === 'function') {
-                log("🚀 Ready! Upload your image.", 'success');
-                imageInput.disabled = false;
-                document.getElementById('dropZone').classList.add('border-green-500');
-            } else {
-                log("⚠️ Script loaded but function missing. Trying manual fix...", 'error');
-            }
-        }
+            // ปลดล็อกหน้าจอ
+            const imageInput = document.getElementById('imageInput');
+            imageInput.disabled = false;
+            document.getElementById('dropZone').classList.add('border-green-500');
+            log("🚀 Ready! System Operational.", "success");
 
-        // 2. ฟังก์ชันทำงานเมื่อโหลดไม่สำเร็จ
-        function libraryFailed() {
-            log("❌ Critical Error: Cannot connect to CDN Server.", 'error');
-            log("⚠️ Please check your internet or AdBlocker.", 'error');
-        }
+            // Setup ตัวแปรอื่นๆ
+            const status = document.getElementById('status');
+            const resultArea = document.getElementById('resultArea');
+            const originalImg = document.getElementById('originalImg');
+            const resultImg = document.getElementById('resultImg');
+            const downloadBtn = document.getElementById('downloadBtn');
 
-        // 3. ฟังก์ชันประมวลผล
-        imageInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            // เริ่มการทำงานเมื่อเลือกรูป
+            imageInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
 
-            resultArea.classList.add('hidden');
-            const reader = new FileReader();
-            reader.onload = (e) => originalImg.src = e.target.result;
-            reader.readAsDataURL(file);
+                resultArea.classList.add('hidden');
+                const reader = new FileReader();
+                reader.onload = (e) => originalImg.src = e.target.result;
+                reader.readAsDataURL(file);
 
-            status.classList.remove('hidden');
-            status.style.color = '#fbbf24';
-            status.innerHTML = "⏳ Starting Processing...";
-            log("🔄 Processing Started...");
+                status.classList.remove('hidden');
+                status.style.color = '#fbbf24';
+                status.innerHTML = "⏳ Phase 1: Warming up AI...";
+                log("🔄 Processing Started...");
 
-            try {
-                // ✅ Config ใหม่: ชี้ไปที่ JSDelivr เพื่อความชัวร์
-                const config = {
-                    publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.0.6/dist/",
-                    progress: (key, current, total) => {
-                        const percent = Math.round((current / total) * 100);
-                        if(percent > 0) status.innerHTML = `⏳ AI Working: ${percent}%`;
-                    }
-                };
+                try {
+                    // Config: ชี้เป้าไปที่ Official Assets (อันนี้ห้ามแก้)
+                    const config = {
+                        publicPath: "https://static.img.ly/background-removal-data/1.0.6/dist/",
+                        progress: (key, current, total) => {
+                            const percent = Math.round((current / total) * 100);
+                            if(percent > 0) status.innerHTML = `⏳ AI Working: ${percent}%`;
+                        }
+                    };
 
-                log("🧠 Downloading Brain from CDN...");
-                
-                // เรียกใช้ฟังก์ชัน
-                const blob = await imglyRemoveBackground(file, config);
-                const url = URL.createObjectURL(blob);
-                
-                resultImg.src = url;
-                downloadBtn.href = url;
-                downloadBtn.download = 'ezgen-nocom.png';
+                    log("🧠 Downloading Brain Data...");
+                    const blob = await imglyRemoveBackground(file, config);
+                    const url = URL.createObjectURL(blob);
+                    
+                    resultImg.src = url;
+                    downloadBtn.href = url;
+                    downloadBtn.download = 'ezgen-nocom.png';
 
-                status.classList.add('hidden');
-                resultArea.classList.remove('hidden');
-                log("✨ Success! Image ready.", 'success');
+                    status.classList.add('hidden');
+                    resultArea.classList.remove('hidden');
+                    log("✨ Success! Background Removed.", "success");
 
-            } catch (error) {
-                console.error(error);
-                status.innerHTML = "❌ Failed.";
-                log(`❌ Error: ${error.message}`, 'error');
-                
-                // ถ้าพัง ให้แนะนำผู้ใช้กด F12
-                if(error.message.includes('fetch')) {
-                     log("⚠️ Hint: Browser blocked the download. Try disabling strict privacy settings.", 'error');
+                } catch (err) {
+                    console.error(err);
+                    status.innerHTML = "❌ Failed.";
+                    log(`❌ Error: ${err.message}`, 'error');
                 }
-            }
-        });
+            });
+
+        } catch (error) {
+            console.error(error);
+            log(`❌ CRITICAL IMPORT ERROR: ${error.message}`, 'error');
+            log("⚠️ Check internet connection.", 'error');
+        }
     </script>
 </body>
 </html>
