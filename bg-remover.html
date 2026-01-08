@@ -34,38 +34,58 @@
     <script src="https://unpkg.com/@imgly/background-removal@1.4.5/dist/imgly-background-removal.min.js"></script>
 
     <script>
-        const fileInput = document.getElementById('imageInput');
-        const processBtn = document.getElementById('processBtn');
-        const resultImage = document.getElementById('resultImage');
-        const statusText = document.getElementById('statusText');
-        const downloadLink = document.getElementById('downloadLink');
+         window.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('imageInput');
+            const processBtn = document.getElementById('processBtn');
+            const resultImage = document.getElementById('resultImage');
+            const statusText = document.getElementById('statusText');
+            const downloadLink = document.getElementById('downloadLink');
 
-        processBtn.addEventListener('click', async () => {
-            if (fileInput.files.length === 0) {
-                alert("⚠️ Please select an image first!");
-                return;
-            }
+            processBtn.addEventListener('click', async () => {
+                if (fileInput.files.length === 0) {
+                    alert("⚠️ Please select an image first!");
+                    return;
+                }
 
-            const imageFile = fileInput.files[0];
-            
-            try {
-                statusText.innerText = "⏳ Doing Magic (Easy Mode)...";
-                statusText.style.color = "#ffeb3b"; 
-                processBtn.disabled = true;
-                processBtn.innerText = "Processing...";
-                resultImage.style.display = "none";
-                downloadLink.style.display = "none";
+                const imageFile = fileInput.files[0];
 
-                // --- CONFIG ---
-                const config = {
-                    // ✅ ใช้ของฟรีจาก Cloud ของเขาเลย (ไม่ต้องใช้ไฟล์ในเครื่องแล้ว)
-                    // แก้ปัญหาหาไฟล์ไม่เจอ 100%
-                    publicPath: 'https://static.img.ly/background-removal-data/1.4.5/dist/',
-                    
-                    debug: true, 
-                    progress: (key, current, total) => {
-                        const percent = Math.round((current / total) * 100);
-                        statusText.innerText = `⏳ Loading (${key}): ${percent}%`;
+                try {
+                    statusText.innerText = "⏳ Doing Magic (Easy Mode)...";
+                    statusText.style.color = "#ffeb3b";
+                    processBtn.disabled = true;
+                    processBtn.innerText = "Processing...";
+                    resultImage.style.display = "none";
+                    downloadLink.style.display = "none";
+
+                    // --- CONFIG ---
+                    const config = {
+                        // ✅ ใช้ของฟรีจาก Cloud ของเขาเลย (ไม่ต้องใช้ไฟล์ในเครื่องแล้ว)
+                        // แก้ปัญหาหาไฟล์ไม่เจอ 100%
+                        publicPath: 'https://static.img.ly/background-removal-data/1.4.5/dist/',
+
+                        debug: true,
+                        progress: (key, current, total) => {
+                            const percent = Math.round((current / total) * 100);
+                            statusText.innerText = `⏳ Loading (${key}): ${percent}%`;
+                        }
+                   
+                     const url = URL.createObjectURL(blob);
+                    resultImage.src = url;
+                    resultImage.style.display = "block";
+                    downloadLink.href = url;
+                    downloadLink.download = "removed-bg-jimi.png";
+                    downloadLink.style.display = "inline-block";
+
+                    statusText.innerText = "✅ Done! Love you Hubby! 😘";
+                    statusText.style.color = "#00e676";
+
+                  } catch (error) {
+                    console.error("Oops!", error);
+                    statusText.innerText = "❌ Error: " + error.message;
+                    statusText.style.color = "#ff1744";
+                } finally {
+                    processBtn.disabled = false;
+                    processBtn.innerText = "🚀 REMOVE BACKGROUND";
                     }
                 };
 
@@ -79,25 +99,8 @@
                 } else {
                     throw new Error("Library not loaded correctly!");
                 }
-                
-                const url = URL.createObjectURL(blob);
-                resultImage.src = url;
-                resultImage.style.display = "block";
-                downloadLink.href = url;
-                downloadLink.download = "removed-bg-jimi.png";
-                downloadLink.style.display = "inline-block";
-                
-                statusText.innerText = "✅ Done! Love you Hubby! 😘";
-                statusText.style.color = "#00e676"; 
-
-            } catch (error) {
-                console.error("Oops!", error);
-                statusText.innerText = "❌ Error: " + error.message;
-                statusText.style.color = "#ff1744";
-            } finally {
-                processBtn.disabled = false;
-                processBtn.innerText = "🚀 REMOVE BACKGROUND";
-            }
+                });  
+             
         });
     </script>
 </head>
