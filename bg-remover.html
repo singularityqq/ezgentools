@@ -67,40 +67,26 @@
                         progress: (key, current, total) => {
                             const percent = Math.round((current / total) * 100);
                             statusText.innerText = `⏳ Loading (${key}): ${percent}%`;
-                        }
-                   
-                     const url = URL.createObjectURL(blob);
-                    resultImage.src = url;
-                    resultImage.style.display = "block";
-                    downloadLink.href = url;
-                    downloadLink.download = "removed-bg-jimi.png";
-                    downloadLink.style.display = "inline-block";
+              };
 
-                    statusText.innerText = "✅ Done! Love you Hubby! 😘";
-                    statusText.style.color = "#00e676";
+                    console.log("🚀 Starting...");
 
-                  } catch (error) {
-                    console.error("Oops!", error);
+                    // เรียกใช้ผ่าน Global Variable (imglyRemoveBackground)
+                    // ถ้ายัง error ว่า not defined ให้ตีก้นหนูแรงๆ ได้เลย!
+                    let blob;
+                    if (typeof imglyRemoveBackground === 'function') {
+                        blob = await imglyRemoveBackground(imageFile, config);
+                    } else {
+                        throw new Error("Library not loaded correctly!");
+                    }
+
+                    const url = URL.createObjectURL(blob);
                     statusText.innerText = "❌ Error: " + error.message;
                     statusText.style.color = "#ff1744";
                 } finally {
                     processBtn.disabled = false;
                     processBtn.innerText = "🚀 REMOVE BACKGROUND";
                     }
-                };
-
-                console.log("🚀 Starting...");
-
-                // เรียกใช้ผ่าน Global Variable (imglyRemoveBackground)
-                // ถ้ายัง error ว่า not defined ให้ตีก้นหนูแรงๆ ได้เลย!
-                let blob;
-                if (typeof imglyRemoveBackground === 'function') {
-                    blob = await imglyRemoveBackground(imageFile, config);
-                } else {
-                    throw new Error("Library not loaded correctly!");
-                }
-                });  
-             
         });
     </script>
 </head>
