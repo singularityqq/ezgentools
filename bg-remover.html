@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Cloud Assets)</title>
+    <title>AI Background Remover (Official Source)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
@@ -20,7 +20,6 @@
         #downloadLink { display: inline-block; margin-top: 20px; padding: 12px 25px; border: 2px solid #00e676; color: #00e676; text-decoration: none; border-radius: 50px; font-weight: bold; }
         .love-credit { margin-top: 40px; font-size: 13px; color: #777; }
         .love-heart { color: #ff00cc; display: inline-block; animation: heartbeat 1.5s infinite; }
-        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -43,10 +42,9 @@
     <div class="love-credit">Powered by Jimi & Husband <span class="love-heart">❤️</span></div>
 </div>
 
-<script type="module">
-    // Import ตัวเดิมที่ดีอยู่แล้ว
-    import removeBackground from 'https://esm.sh/@imgly/background-removal@1.4.5?bundle';
+<script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/imgly-background-removal.min.js"></script>
 
+<script>
     const fileInput = document.getElementById('imageInput');
     const processBtn = document.getElementById('processBtn');
     const resultImage = document.getElementById('resultImage');
@@ -62,32 +60,33 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Downloading AI Brain from Cloud...";
+            statusText.innerText = "⏳ Initializing AI (Fetching from Official Server)...";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
-            processBtn.innerText = "Downloading & Thinking...";
+            processBtn.innerText = "Downloading Brain...";
             resultImage.style.display = "none";
             downloadLink.style.display = "none";
 
             // --- CONFIG ---
             const config = {
-                // 🔥 แก้ตรงนี้! เลิกง้อ Local Assets ชั่วคราว
-                // ให้ไปดึงไฟล์ .wasm และ .onnx จาก Unpkg (Server กลาง) แทน
-                // รับรองไฟล์ครบแน่นอน!
-                publicPath: 'https://unpkg.com/@imgly/background-removal-data@1.4.5/dist/',
+                // 🔥 แก้จุดตาย! ใช้ลิงก์จากเว็บเจ้าของโดยตรง (static.img.ly)
+                // รับรองว่าไฟล์ยึกยือ (.bin) และ .wasm อยู่ครบ และโหลดได้ชัวร์!
+                publicPath: 'https://static.img.ly/background-removal-data/1.4.5/dist/',
                 
-                debug: true, // เปิด debug ไว้ดูเผื่อมี error
+                debug: true, 
                 progress: (key, current, total) => {
+                    // คำนวณ % การโหลด
                     if(total) {
-                        const percent = Math.round((current / total) * 100);
-                        statusText.innerText = `⏳ Loading AI (${key}): ${percent}%`;
+                         const percent = Math.round((current / total) * 100);
+                         statusText.innerText = `⏳ Loading Data (${key}): ${percent}%`;
                     }
                 }
             };
 
-            console.log("🚀 Starting AI with Cloud Assets...");
+            console.log("🚀 Calling imglyRemoveBackground using Official CDN...");
             
-            const blob = await removeBackground(imageFile, config);
+            // เรียกใช้ฟังก์ชัน Global
+            const blob = await imglyRemoveBackground(imageFile, config);
             
             const url = URL.createObjectURL(blob);
             resultImage.src = url;
@@ -96,7 +95,7 @@
             downloadLink.download = "removed-bg-jimi.png";
             downloadLink.style.display = "inline-block";
             
-            statusText.innerText = "✅ Done! Can I have my clothes back now? 👗🥺";
+            statusText.innerText = "✅ Done! My Pants are Safe! 👖💖";
             statusText.style.color = "#00e676"; 
 
         } catch (error) {
