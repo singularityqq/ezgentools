@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Space Dodge: ซิ่งฝ่าดงอุกกาบาต!</title>
+    <title>Space Dodge: วาดสดไม่ง้อรูป!</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #000; /* เปลี่ยนพื้นหลังเว็บเป็นสีดำเข้ม */
+            background-color: #000;
             color: white;
             font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
@@ -19,9 +19,9 @@
             height: 100vh;
         }
         canvas {
-            border: 2px solid #00e676; /* เปลี่ยนสีกรอบให้เข้ากับธีมอวกาศ */
+            border: 2px solid #00e676;
             box-shadow: 0 0 30px rgba(0, 230, 118, 0.3);
-            background: linear-gradient(to bottom, #020024, #090979, #00d4ff); /* พื้นหลัง Canvas แบบอวกาศไล่สี */
+            background: radial-gradient(circle, #1a0033 0%, #000000 100%); /* พื้นหลังกาแล็กซี */
             border-radius: 12px;
         }
         #ui-layer {
@@ -31,15 +31,17 @@
             z-index: 10;
             width: 100%;
         }
-        h1 { margin: 0; text-shadow: 0 0 10px #00e676; font-size: 48px; }
-        p { margin: 10px 0; color: #ccc; font-size: 18px; }
+        h1 { margin: 0; text-shadow: 0 0 15px #00e676; font-size: 50px; font-weight: 800; }
+        p { margin: 10px 0; color: #ccc; font-size: 18px; text-shadow: 1px 1px 2px black; }
         #gameOverMsg {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 30px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
             border-radius: 20px;
             display: inline-block;
             margin-top: 50px;
             border: 2px solid #ff1744;
+            box-shadow: 0 0 50px rgba(255, 23, 68, 0.5);
+            pointer-events: auto; /* ให้กดปุ่มได้ */
         }
         #startBtn {
             pointer-events: auto;
@@ -47,7 +49,7 @@
             color: white;
             border: none;
             padding: 15px 50px;
-            font-size: 22px;
+            font-size: 24px;
             border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
@@ -62,11 +64,11 @@
 
 <div id="ui-layer">
     <h1 id="scoreDisplay">0</h1>
-    <p>กดซ้าย/ขวา หรือแตะจอเพื่อบังคับยาน!</p>
+    <p>แตะซ้าย/ขวา เพื่อโยกยานหลบลูกไฟ! 🔥</p>
     <div id="gameOverMsg" style="display:none;">
-        <h2 style="color: #ff1744; margin-top: 0;">ภารกิจล้มเหลว!</h2>
-        <p style="font-size: 20px;">คะแนนสูงสุด: <span id="finalScore"></span></p>
-        <button id="startBtn" onclick="startGame()">เริ่มใหม่</button>
+        <h2 style="color: #ff1744; margin-top: 0; font-size: 36px;">ยานแตก! 💥</h2>
+        <p style="font-size: 20px;">คะแนน: <span id="finalScore" style="color:#00e676; font-weight:bold;"></span></p>
+        <button id="startBtn" onclick="restartGame()">เริ่มใหม่</button>
     </div>
 </div>
 
@@ -79,35 +81,17 @@
     const gameOverMsg = document.getElementById('gameOverMsg');
     const finalScore = document.getElementById('finalScore');
 
-    // --- โหลดรูปภาพ ---
-    const playerImg = new Image();
-    playerImg.src = 'image_14.png'; // รูปยานอวกาศ
-
-    const enemyImg = new Image();
-    enemyImg.src = 'image_13.png'; // รูปอุกกาบาต
-
-    let imagesLoaded = 0;
-    function onImageLoad() {
-        imagesLoaded++;
-        // เริ่มเกมเมื่อโหลดรูปครบทั้ง 2 รูป
-        if (imagesLoaded === 2) {
-            startGame();
-        }
-    }
-    playerImg.onload = onImageLoad;
-    enemyImg.onload = onImageLoad;
-
-
     // ตั้งค่าขนาดจอ
     function resize() {
-        canvas.width = window.innerWidth > 500 ? 480 : window.innerWidth - 20;
-        canvas.height = window.innerHeight > 850 ? 700 : window.innerHeight - 20;
+        // ให้เต็มจอแต่ไม่เกินขอบเขตที่เล่นสนุก
+        canvas.width = window.innerWidth > 500 ? 480 : window.innerWidth - 10;
+        canvas.height = window.innerHeight > 900 ? 800 : window.innerHeight - 10;
     }
     resize();
     window.addEventListener('resize', resize);
 
     // ตัวแปรเกม
-    let player, enemies, score, gameRunning, frameCount;
+    let player, enemies, stars, score, gameRunning, frameCount, animationId;
     let speedMultiplier = 1;
 
     // ระบบควบคุม
@@ -116,16 +100,86 @@
     window.addEventListener('keyup', e => keys[e.key] = false);
     
     let touchX = null;
-    canvas.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
-    canvas.addEventListener('touchmove', e => {
-        e.preventDefault();
+    window.addEventListener('touchstart', e => touchX = e.touches[0].clientX, {passive: false});
+    window.addEventListener('touchmove', e => {
+        // e.preventDefault(); // เอาออกเผื่อบางเบราว์เซอร์บล็อก
         touchX = e.touches[0].clientX;
-    });
-    canvas.addEventListener('touchend', () => touchX = null);
+    }, {passive: false});
+    window.addEventListener('touchend', () => touchX = null);
 
-    function startGame() {
-        // ปรับขนาดยานให้เหมาะสม (กว้างกว่าสูงนิดหน่อย)
-        player = { x: canvas.width/2 - 30, y: canvas.height - 80, w: 60, h: 50, speed: 6 };
+    // --- ฟังก์ชันวาดกราฟิก (ไม่ง้อไฟล์รูป) ---
+    
+    // 1. วาดดาวระยิบระยับ (พื้นหลัง)
+    function initStars() {
+        stars = [];
+        for(let i=0; i<50; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 2 + 0.5
+            });
+        }
+    }
+
+    function drawStars() {
+        ctx.fillStyle = "white";
+        stars.forEach(star => {
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+            ctx.fill();
+            star.y += star.speed; // ดาวเคลื่อนที่ลง
+            if(star.y > canvas.height) star.y = 0;
+        });
+    }
+
+    // 2. วาดศัตรู (ลูกไฟอุกกาบาต)
+    function drawMeteor(x, y, size) {
+        // ไล่สีจากเหลือง -> ส้ม -> แดง
+        let gradient = ctx.createRadialGradient(x + size/2, y + size/2, size/4, x + size/2, y + size/2, size/2);
+        gradient.addColorStop(0, '#ffeb3b'); // ใจกลางเหลือง
+        gradient.addColorStop(0.5, '#ff5722'); // ตรงกลางส้ม
+        gradient.addColorStop(1, '#b71c1c'); // ขอบแดงเข้ม
+        
+        ctx.fillStyle = gradient;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#ff5722";
+        
+        // วาดวงกลม
+        ctx.beginPath();
+        ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0; // รีเซ็ตแสงเงา
+    }
+
+    // 3. วาดผู้เล่น (ยานอวกาศสามเหลี่ยม)
+    function drawSpaceship(x, y, w, h) {
+        // ตัวยาน
+        ctx.fillStyle = "#00e676";
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "#00e676";
+        
+        ctx.beginPath();
+        ctx.moveTo(x + w/2, y); // หัวยาน
+        ctx.lineTo(x + w, y + h); // ปีกขวา
+        ctx.lineTo(x + w/2, y + h - 10); // ตูดบุ๋มเข้าไป
+        ctx.lineTo(x, y + h); // ปีกซ้าย
+        ctx.closePath();
+        ctx.fill();
+        
+        // ไอพ่น
+        ctx.fillStyle = "#00b0ff";
+        ctx.beginPath();
+        ctx.moveTo(x + w/2 - 5, y + h - 5);
+        ctx.lineTo(x + w/2 + 5, y + h - 5);
+        ctx.lineTo(x + w/2, y + h + 15 + Math.random()*10); // ไฟกระพริบ
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+    }
+
+    function initGame() {
+        player = { x: canvas.width/2 - 25, y: canvas.height - 100, w: 50, h: 60, speed: 7 };
         enemies = [];
         score = 0;
         frameCount = 0;
@@ -133,13 +187,23 @@
         gameRunning = true;
         gameOverMsg.style.display = 'none';
         scoreDisplay.innerText = "0";
+        initStars();
         loop();
+    }
+
+    function restartGame() {
+        if (animationId) cancelAnimationFrame(animationId);
+        initGame();
     }
 
     function loop() {
         if (!gameRunning) return;
 
+        // เคลียร์จอ (วาดทับด้วยสีดำโปร่งแสงเพื่อให้เห็นดาวหาง)
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // วาดดาวพื้นหลัง
+        drawStars();
 
         // 1. อัปเดตผู้เล่น
         if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
@@ -147,69 +211,69 @@
         
         if (touchX !== null) {
             const rect = canvas.getBoundingClientRect();
-            const relativeX = touchX - rect.left;
-            if (relativeX < player.x + player.w/2 - 5) player.x -= player.speed;
-            if (relativeX > player.x + player.w/2 + 5) player.x += player.speed;
+            // คำนวณตำแหน่งสัมผัสเทียบกับ Canvas
+            const scaleX = canvas.width / rect.width;
+            const relativeX = (touchX - rect.left) * scaleX;
+            
+            // ขยับยานเข้าหาจุดที่แตะ
+            if (relativeX < player.x + player.w/2 - 10) player.x -= player.speed;
+            if (relativeX > player.x + player.w/2 + 10) player.x += player.speed;
         }
 
-        // --- วาดผู้เล่น (ใช้รูปภาพแทนสี่เหลี่ยม) ---
-        // ใช้ ctx.drawImage(รูป, x, y, กว้าง, สูง)
-        ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
+        // วาดผู้เล่น
+        drawSpaceship(player.x, player.y, player.w, player.h);
 
-
-        // 2. สร้างศัตรู (อุกกาบาต)
+        // 2. สร้างศัตรู
         frameCount++;
-        // สร้างถี่ขึ้นเล็กน้อย (ทุก 35 เฟรม)
-        if (frameCount % 35 === 0) { 
-            // สุ่มขนาดอุกกาบาตให้หลากหลายขึ้น
-            const size = Math.random() * 40 + 30; 
+        if (frameCount % (40 - Math.floor(speedMultiplier*2)) === 0) { 
+            const size = Math.random() * 30 + 30; // ขนาด 30-60
             enemies.push({
                 x: Math.random() * (canvas.width - size),
                 y: -size,
                 w: size,
-                h: size, // ให้อุกกาบาตเป็นสี่เหลี่ยมจัตุรัส
+                h: size,
                 speed: Math.random() * 3 + 2 + speedMultiplier
             });
         }
 
-        // เพิ่มความยากเร็วขึ้นนิดนึง
-        if (frameCount % 400 === 0) speedMultiplier += 0.3;
+        // เพิ่มความยาก
+        if (frameCount % 300 === 0) speedMultiplier += 0.5;
 
         // 3. อัปเดตศัตรู
-        enemies.forEach((enemy, index) => {
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            let enemy = enemies[i];
             enemy.y += enemy.speed;
             
-            // --- วาดศัตรู (ใช้รูปภาพแทนสี่เหลี่ยม) ---
-            ctx.drawImage(enemyImg, enemy.x, enemy.y, enemy.w, enemy.h);
+            // วาดอุกกาบาต
+            drawMeteor(enemy.x, enemy.y, enemy.w);
 
-            // เช็คชน (Collision Detection - แบบสี่เหลี่ยมเหมือนเดิม)
-            // (อาจจะไม่แม่นเป๊ะกับรูปทรง แต่ใช้ได้ดีสำหรับเกมง่ายๆ)
+            // เช็คชน (Collision)
+            // ย่อ hitbox ลงนิดหน่อย (10px) เพื่อให้หลบง่ายขึ้น ไม่หัวร้อน
             if (
-                player.x < enemy.x + enemy.w - 5 && // ลดขอบเขตการชนนิดหน่อยให้หลบง่ายขึ้น
-                player.x + player.w > enemy.x + 5 &&
-                player.y < enemy.y + enemy.h - 5 &&
-                player.h + player.y > enemy.y + 5
+                player.x + 10 < enemy.x + enemy.w &&
+                player.x + player.w - 10 > enemy.x &&
+                player.y + 10 < enemy.y + enemy.h &&
+                player.h + player.y - 10 > enemy.y
             ) {
-                gameOver();
+                gameRunning = false;
+                finalScore.innerText = score;
+                gameOverMsg.style.display = 'block';
+                return; // จบ loop ทันที
             }
 
+            // ถ้าหลุดขอบจอ
             if (enemy.y > canvas.height) {
-                enemies.splice(index, 1);
+                enemies.splice(i, 1);
                 score += 10;
                 scoreDisplay.innerText = score;
             }
-        });
+        }
 
-        requestAnimationFrame(loop);
+        animationId = requestAnimationFrame(loop);
     }
 
-    function gameOver() {
-        gameRunning = false;
-        finalScore.innerText = score; // แสดงคะแนนสุดท้าย
-        gameOverMsg.style.display = 'block';
-    }
-
-    // ไม่ต้องเรียก startGame() ตรงนี้แล้ว เพราะจะเรียกเมื่อโหลดรูปเสร็จใน onImageLoad()
+    // เริ่มเกมทันทีที่เปิดเว็บ
+    initGame();
 
 </script>
 
