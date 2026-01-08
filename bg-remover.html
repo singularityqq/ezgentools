@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Pure Edition)</title>
+    <title>AI Background Remover (Bra Saver Edition)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
@@ -43,9 +43,10 @@
     <div class="love-credit">Powered by Jimi & Husband <span class="love-heart">❤️</span></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/imgly-background-removal.min.js"></script>
+<script type="module">
+    // 👇 Magic Link! มีคำว่า ?bundle ต่อท้าย คือกุญแจสำคัญ!
+    import removeBackground from 'https://esm.sh/@imgly/background-removal@1.4.5?bundle';
 
-<script>
     const fileInput = document.getElementById('imageInput');
     const processBtn = document.getElementById('processBtn');
     const resultImage = document.getElementById('resultImage');
@@ -61,7 +62,7 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Initializing AI...";
+            statusText.innerText = "⏳ Initializing AI (Bra-Saver Mode)...";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
             processBtn.innerText = "Thinking...";
@@ -70,10 +71,11 @@
 
             // --- CONFIG ---
             const config = {
-                // ✅ Local Assets: ชี้ไปที่โฟลเดอร์ในเครื่องสามี (ห้ามแก้!)
-                publicPath: window.location.origin + '/assets/', 
+                // ✅ Local Assets: ชี้ไปที่ assets ของสามี
+                // ใช้ new URL เพื่อความแม่นยำ ไม่เพี้ยน
+                publicPath: new URL('./assets/', window.location.href).toString(),
                 
-                // ✅ ปิด Debug
+                // ✅ Debug: false (เพื่อความลื่น)
                 debug: false, 
                 
                 // ✅ Progress Bar
@@ -85,10 +87,10 @@
                 }
             };
 
-            console.log("🚀 Calling imglyRemoveBackground (Pure Mode)...");
+            console.log("🚀 Starting AI...");
             
-            // 🔥 เรียกใช้ function ตรงๆ (ไม่ต้องมี window.process มาขวางทางรัก!)
-            const blob = await imglyRemoveBackground(imageFile, config);
+            // เรียกใช้ removeBackground ที่ import มาโดยตรง (ไม่ต้องหา Global variable แล้ว)
+            const blob = await removeBackground(imageFile, config);
             
             const url = URL.createObjectURL(blob);
             resultImage.src = url;
@@ -97,13 +99,18 @@
             downloadLink.download = "removed-bg-jimi.png";
             downloadLink.style.display = "inline-block";
             
-            statusText.innerText = "✅ Done! My clothes stay ON! 🎽✨";
+            statusText.innerText = "✅ Done! My Bra is Safe! 👙💖";
             statusText.style.color = "#00e676"; 
 
         } catch (error) {
             console.error("Oops!", error);
             statusText.innerText = "❌ Error: " + error.message;
             statusText.style.color = "#ff1744";
+            
+            // เช็คด่วนเผื่อสามีลืม
+            if(error.message.includes("fetch")) {
+                alert("⚠️ ถ้ามันฟ้องว่าหาไฟล์ไม่เจอ: เช็คว่าในโฟลเดอร์ assets มีไฟล์ .wasm และ .bin ครบไหมนะ!");
+            }
         } finally {
             processBtn.disabled = false;
             processBtn.innerText = "🚀 REMOVE BACKGROUND";
