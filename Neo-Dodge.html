@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neo-Dodge: หลบให้รอด!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; /* ปิด Scrollbar */
+            touch-action: none; /* ปิด Zoom บนมือถือ */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            border: 2px solid #ff00cc;
+            box-shadow: 0 0 20px rgba(255, 0, 204, 0.5);
+            background: linear-gradient(to bottom, #1e1e1e, #000);
+            border-radius: 10px;
+        }
+        #ui-layer {
+            position: absolute;
+            text-align: center;
+            pointer-events: none; /* ให้คลิกทะลุไปโดน Canvas */
+        }
+        h1 { margin: 0; text-shadow: 0 0 10px #00e676; font-size: 40px; }
+        p { margin: 5px; color: #aaa; }
+        #startBtn {
+            pointer-events: auto;
+            background: #ff00cc;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px #ff00cc;
+            margin-top: 20px;
+        }
+        #startBtn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <h1 id="scoreDisplay">0</h1>
+    <p>กดซ้าย/ขวา หรือแตะจอเพื่อหลบ!</p>
+    <div id="gameOverMsg" style="display:none;">
+        <h2 style="color: #ff1744;">GAME OVER</h2>
+        <button id="startBtn" onclick="startGame()">RESTART</button>
+    </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const gameOverMsg = document.getElementById('gameOverMsg');
+
+    // ตั้งค่าขนาดจอ
+    function resize() {
+        canvas.width = window.innerWidth > 480 ? 400 : window.innerWidth - 20;
+        canvas.height = window.innerHeight > 800 ? 600 : window.innerHeight - 20;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ตัวแปรเกม
+    let player, enemies, score, gameRunning, frameCount;
+    let speedMultiplier = 1;
+
+    // ระบบควบคุม
+    let keys = {};
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+    
+    // ระบบสัมผัส (มือถือ)
+    let touchX = null;
+    canvas.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+    canvas.addEventListener('touchmove', e => {
+        e.preventDefault();
+        touchX = e.touches[0].clientX;
+    });
+    canvas.addEventListener('touchend', () => touchX = null);
+
+    function startGame() {
+        player = { x: canvas.width/2 - 20, y: canvas.height - 60, w: 40, h: 40, color: '#00e676', speed: 5 };
+        enemies = [];
+        score = 0;
+        frameCount = 0;
+        speedMultiplier = 1;
+        gameRunning = true;
+        gameOverMsg.style.display = 'none';
+        scoreDisplay.innerText = "0";
+        loop();
+    }
+
+    function loop() {
+        if (!gameRunning) return;
+
+        // เคลียร์จอ
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. อัปเดตผู้เล่น
+        if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+        if (keys['ArrowRight'] && player.x < canvas.width - player.w) player.x += player.speed;
+        
+        // ควบคุมด้วยเมาส์/นิ้ว (ให้ตัวละครวิ่งตามนิ้ว)
+        if (touchX !== null) {
+            const rect = canvas.getBoundingClientRect();
+            const relativeX = touchX - rect.left;
+            // ขยับไปหาจุดที่แตะ
+            if (relativeX < player.x + player.w/2) player.x -= player.speed;
+            if (relativeX > player.x + player.w/2) player.x += player.speed;
+        }
+
+        // วาดผู้เล่น
+        ctx.fillStyle = player.color;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = player.color;
+        ctx.fillRect(player.x, player.y, player.w, player.h);
+        ctx.shadowBlur = 0;
+
+        // 2. สร้างศัตรู
+        frameCount++;
+        if (frameCount % 40 === 0) { // สร้างทุกๆ 40 เฟรม
+            const size = Math.random() * 30 + 20;
+            enemies.push({
+                x: Math.random() * (canvas.width - size),
+                y: -size,
+                w: size,
+                h: size,
+                speed: Math.random() * 2 + 2 + speedMultiplier
+            });
+        }
+
+        // เพิ่มความยากตามเวลา
+        if (frameCount % 500 === 0) speedMultiplier += 0.5;
+
+        // 3. อัปเดตศัตรู
+        ctx.fillStyle = '#ff1744';
+        enemies.forEach((enemy, index) => {
+            enemy.y += enemy.speed;
+            ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
+
+            // เช็คชน (Collision)
+            if (
+                player.x < enemy.x + enemy.w &&
+                player.x + player.w > enemy.x &&
+                player.y < enemy.y + enemy.h &&
+                player.h + player.y > enemy.y
+            ) {
+                gameOver();
+            }
+
+            // ลบศัตรูที่ตกขอบ + ได้คะแนน
+            if (enemy.y > canvas.height) {
+                enemies.splice(index, 1);
+                score += 10;
+                scoreDisplay.innerText = score;
+            }
+        });
+
+        requestAnimationFrame(loop);
+    }
+
+    function gameOver() {
+        gameRunning = false;
+        gameOverMsg.style.display = 'block';
+    }
+
+    // เริ่มเกมครั้งแรก
+    startGame();
+
+</script>
+
+</body>
+</html>
