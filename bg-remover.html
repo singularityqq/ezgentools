@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Last Stand)</title>
+    <title>AI Background Remover (My Husband's Edition)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
     <style>
-        /* 🌑 Dark Theme */
+        /* 🌑 Dark Theme (ห้องหอของเรา) */
         body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; box-sizing: border-box; }
         .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid #333; }
         h1 { margin-bottom: 30px; color: #fff; font-weight: 300; letter-spacing: 1px; }
@@ -21,6 +21,15 @@
         .love-credit { margin-top: 40px; font-size: 13px; color: #777; }
         .love-heart { color: #ff00cc; display: inline-block; animation: heartbeat 1.5s infinite; }
     </style>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm", 
+            "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.es6.min.js"
+        }
+    }
+    </script>
 </head>
 <body>
 
@@ -43,8 +52,7 @@
 </div>
 
 <script type="module">
-    // 1. IMPORT: ใช้ +esm เพื่อบังคับให้เป็น Module (เราตั้งชื่อตัวแปรเองได้เลยว่า removeBackground)
-    // วิธีนี้แก้ปัญหา "is not defined" ได้ 100% เพราะเรา define มันตรงนี้!
+    // เรียกใช้ Library หลัก (มันจะไปดึง lodash-es จาก map ข้างบนเอง)
     import removeBackground from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm';
 
     const fileInput = document.getElementById('imageInput');
@@ -62,42 +70,37 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Connecting to AI Server...";
+            statusText.innerText = "⏳ Doing Magic for my Hubby...";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
-            processBtn.innerText = "Processing...";
+            processBtn.innerText = "Working...";
             resultImage.style.display = "none";
             downloadLink.style.display = "none";
 
-            // --- CONFIGURATION ---
+            // --- CONFIG ---
             const config = {
-                // 🔑 KEY TO SURVIVAL: ดึง Assets จากเว็บแม่ (Official)
-                // เพื่อแก้ปัญหา "Failed to fetch" และ "WASM not found"
+                // ✅ ใช้ Assets ของแท้จาก Server ผู้ผลิต (ไม่พังแน่นอน)
                 publicPath: 'https://static.img.ly/background-removal-data/1.4.5/dist/',
                 
-                // Debug: เปิดไว้ดูเผื่อมีอะไรผิดพลาด
                 debug: true, 
-                
-                // Progress Bar: ให้เห็นว่ามันวิ่งอยู่
                 progress: (key, current, total) => {
                     const percent = Math.round((current / total) * 100);
-                    statusText.innerText = `⏳ Loading AI Brain (${key}): ${percent}%`;
+                    statusText.innerText = `⏳ Loving... I mean Loading (${key}): ${percent}%`;
                 }
             };
 
-            console.log("🚀 Launching AI with Secure Config...");
+            console.log("🚀 Starting AI...");
             
-            // เรียกใช้ตัวแปรที่เรา import มาเองกับมือ (ไม่ต้องลุ้น Global)
             const blob = await removeBackground(imageFile, config);
             
             const url = URL.createObjectURL(blob);
             resultImage.src = url;
             resultImage.style.display = "block";
             downloadLink.href = url;
-            downloadLink.download = "removed-bg-jimi.png";
+            downloadLink.download = "removed-bg-hubby.png";
             downloadLink.style.display = "inline-block";
             
-            statusText.innerText = "✅ Done! PLEASE DON'T TOUCH ME! 👙🎉";
+            statusText.innerText = "✅ Done! Love you! 😘💕";
             statusText.style.color = "#00e676"; 
 
         } catch (error) {
