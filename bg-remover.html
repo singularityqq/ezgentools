@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Official Source)</title>
+    <title>AI Background Remover (Last Stand)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
@@ -42,9 +42,11 @@
     <div class="love-credit">Powered by Jimi & Husband <span class="love-heart">❤️</span></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/imgly-background-removal.min.js"></script>
+<script type="module">
+    // 1. IMPORT: ใช้ +esm เพื่อบังคับให้เป็น Module (เราตั้งชื่อตัวแปรเองได้เลยว่า removeBackground)
+    // วิธีนี้แก้ปัญหา "is not defined" ได้ 100% เพราะเรา define มันตรงนี้!
+    import removeBackground from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm';
 
-<script>
     const fileInput = document.getElementById('imageInput');
     const processBtn = document.getElementById('processBtn');
     const resultImage = document.getElementById('resultImage');
@@ -60,33 +62,33 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Initializing AI (Fetching from Official Server)...";
+            statusText.innerText = "⏳ Connecting to AI Server...";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
-            processBtn.innerText = "Downloading Brain...";
+            processBtn.innerText = "Processing...";
             resultImage.style.display = "none";
             downloadLink.style.display = "none";
 
-            // --- CONFIG ---
+            // --- CONFIGURATION ---
             const config = {
-                // 🔥 แก้จุดตาย! ใช้ลิงก์จากเว็บเจ้าของโดยตรง (static.img.ly)
-                // รับรองว่าไฟล์ยึกยือ (.bin) และ .wasm อยู่ครบ และโหลดได้ชัวร์!
+                // 🔑 KEY TO SURVIVAL: ดึง Assets จากเว็บแม่ (Official)
+                // เพื่อแก้ปัญหา "Failed to fetch" และ "WASM not found"
                 publicPath: 'https://static.img.ly/background-removal-data/1.4.5/dist/',
                 
+                // Debug: เปิดไว้ดูเผื่อมีอะไรผิดพลาด
                 debug: true, 
+                
+                // Progress Bar: ให้เห็นว่ามันวิ่งอยู่
                 progress: (key, current, total) => {
-                    // คำนวณ % การโหลด
-                    if(total) {
-                         const percent = Math.round((current / total) * 100);
-                         statusText.innerText = `⏳ Loading Data (${key}): ${percent}%`;
-                    }
+                    const percent = Math.round((current / total) * 100);
+                    statusText.innerText = `⏳ Loading AI Brain (${key}): ${percent}%`;
                 }
             };
 
-            console.log("🚀 Calling imglyRemoveBackground using Official CDN...");
+            console.log("🚀 Launching AI with Secure Config...");
             
-            // เรียกใช้ฟังก์ชัน Global
-            const blob = await imglyRemoveBackground(imageFile, config);
+            // เรียกใช้ตัวแปรที่เรา import มาเองกับมือ (ไม่ต้องลุ้น Global)
+            const blob = await removeBackground(imageFile, config);
             
             const url = URL.createObjectURL(blob);
             resultImage.src = url;
@@ -95,7 +97,7 @@
             downloadLink.download = "removed-bg-jimi.png";
             downloadLink.style.display = "inline-block";
             
-            statusText.innerText = "✅ Done! My Pants are Safe! 👖💖";
+            statusText.innerText = "✅ Done! PLEASE DON'T TOUCH ME! 👙🎉";
             statusText.style.color = "#00e676"; 
 
         } catch (error) {
