@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Tank Build)</title>
+    <title>AI Background Remover (Fixed Name)</title>
 
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
 
@@ -52,6 +52,16 @@
     const statusText = document.getElementById('statusText');
     const downloadLink = document.getElementById('downloadLink');
 
+    // 🕵️‍♀️ ส่วน Debug: เช็คว่าตัวแปรชื่ออะไรกันแน่?
+    window.onload = function() {
+        if (typeof imglyRemoveBackground !== 'undefined') {
+            console.log("✅ SUCCESS: พบตัวแปร 'imglyRemoveBackground' แล้ว!");
+        } else {
+            console.log("❌ DEBUG INFO: รายชื่อตัวแปร global ทั้งหมดที่ขึ้นต้นด้วย imgly:");
+            console.log(Object.keys(window).filter(k => k.toLowerCase().includes('imgly')));
+        }
+    };
+
     processBtn.addEventListener('click', async () => {
         if (fileInput.files.length === 0) {
             alert("⚠️ Please select an image first!");
@@ -61,33 +71,40 @@
         const imageFile = fileInput.files[0];
         
         try {
-            statusText.innerText = "⏳ Initializing AI (Tank Mode)...";
+            statusText.innerText = "⏳ Initializing AI...";
             statusText.style.color = "#ffeb3b"; 
             processBtn.disabled = true;
             processBtn.innerText = "Thinking...";
             resultImage.style.display = "none";
             downloadLink.style.display = "none";
 
-            // --- CONFIG ---
             const config = {
-                // ✅ Local Assets: ชี้ไปที่โฟลเดอร์ในเครื่อง (สำคัญมาก!)
+                // ✅ Local Assets Path
                 publicPath: window.location.origin + '/assets/', 
-                
-                // ✅ ปิด Debug
                 debug: false, 
-                
-                // ✅ Progress Bar
                 progress: (key, current, total) => {
                     const percent = Math.round((current / total) * 100);
                     statusText.innerText = `⏳ AI Processing (${key}): ${percent}%`;
                 }
             };
 
-            console.log("🚀 Starting AI via Global Variable...");
+            console.log("🚀 Calling imglyRemoveBackground...");
             
-            // 🔥 KEY POINT: เรียกใช้ผ่านตัวแปร Global "imglyBackgroundRemoval"
-            // (นี่คือชื่อที่ถูกต้องสำหรับเวอร์ชั่น UMD ค่ะ!)
-            const blob = await imglyBackgroundRemoval.removeBackground(imageFile, config);
+            // 🔥 KEY POINT: ชื่อที่ถูกต้องคือ "imglyRemoveBackground" (ไม่มีคำว่า Removal)
+            // และตัวแปรนี้เป็น Function โดยตรงเลย ไม่ต้อง .removeBackground อีกที
+            let blob;
+            
+            // กันเหนียว: ลองเรียกแบบ Function ตรงๆ ก่อน
+            if (typeof imglyRemoveBackground === 'function') {
+                 blob = await imglyRemoveBackground(imageFile, config);
+            } 
+            // เผื่อมันซ่อนอยู่ใน object (บางที browser bundle ทำตัวแปลกๆ)
+            else if (window.imglyBackgroundRemoval && typeof window.imglyBackgroundRemoval.removeBackground === 'function') {
+                 blob = await window.imglyBackgroundRemoval.removeBackground(imageFile, config);
+            }
+            else {
+                throw new Error("หาฟังก์ชันลบพื้นหลังไม่เจอ! (โปรดดู Console F12)");
+            }
             
             const url = URL.createObjectURL(blob);
             resultImage.src = url;
@@ -96,7 +113,7 @@
             downloadLink.download = "removed-bg-jimi.png";
             downloadLink.style.display = "inline-block";
             
-            statusText.innerText = "✅ Done! No more errors! 🎉";
+            statusText.innerText = "✅ Done! Clean & Perfect! 🎉";
             statusText.style.color = "#00e676"; 
 
         } catch (error) {
