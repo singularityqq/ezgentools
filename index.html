@@ -1,102 +1,217 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EzGenTools - Free AI Tools Collection</title>
-    <meta name="description" content="Free online AI tools to generate YouTube titles, Hashtags, and more.">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols:wght@400;700&display=swap" rel="stylesheet">
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Space Dodge: ซิ่งฝ่าดงอุกกาบาต!</title>
     <style>
-        :root { --primary: #2563eb; --dark: #0f172a; --light: #f8fafc; --accent: #3b82f6; --card: #1e293b; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); }
-        
-        /* Navbar */
-        .navbar { background-color: rgba(15, 23, 42, 0.95); padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
-        .logo span { color: var(--accent); }
-        .nav-links a { color: #cbd5e1; text-decoration: none; margin-left: 1.5rem; transition: 0.3s; }
-        .nav-links a:hover { color: var(--accent); }
-
-        /* Hero Section */
-        .hero { text-align: center; padding: 4rem 1rem; }
-        h1 { font-size: 3.5rem; margin-bottom: 0.5rem; background: linear-gradient(to right, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        p.subtitle { font-size: 1.2rem; color: #94a3b8; margin-bottom: 3rem; }
-
-        /* Grid Tools */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto; padding: 0 1rem; }
-        .tool-card { background-color: var(--card); padding: 2rem; border-radius: 12px; border: 1px solid #334155; transition: 0.3s; text-decoration: none; color: inherit; display: block; }
-        .tool-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
-        .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
-        .tool-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--accent); }
-        .tool-desc { color: #94a3b8; font-size: 0.9rem; }
-
-        footer { text-align: center; margin-top: 4rem; padding: 2rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #1e293b; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* เปลี่ยนพื้นหลังเว็บเป็นสีดำเข้ม */
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            border: 2px solid #00e676; /* เปลี่ยนสีกรอบให้เข้ากับธีมอวกาศ */
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.3);
+            background: linear-gradient(to bottom, #020024, #090979, #00d4ff); /* พื้นหลัง Canvas แบบอวกาศไล่สี */
+            border-radius: 12px;
+        }
+        #ui-layer {
+            position: absolute;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+            width: 100%;
+        }
+        h1 { margin: 0; text-shadow: 0 0 10px #00e676; font-size: 48px; }
+        p { margin: 10px 0; color: #ccc; font-size: 18px; }
+        #gameOverMsg {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 50px;
+            border: 2px solid #ff1744;
+        }
+        #startBtn {
+            pointer-events: auto;
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 0, 204, 0.6);
+            margin-top: 20px;
+            transition: transform 0.1s;
+        }
+        #startBtn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
-<style>
-    /* เพิ่มบรรทัดนี้ใน CSS ของ body */
-    body { font-family: 'Noto Sans Symbols', 'Segoe UI', sans-serif; }
-</style>
-    <nav class="navbar">
-        <a href="index.html" class="logo">EzGen<span>Tools</span></a>
-        <div class="nav-links">
-            <a href="index.html" style="color:var(--accent);">Home</a>
-            <a href="youtube-title-gen.html">YT Title</a>
-            <a href="caption-gen.html">Caption</a>
-            <a href="fancy-font-gen.html">Fancy Font</a>
-             <a href="quote-maker.html">Quote Maker</a>
-            <a href="bg-remover.html">BG Remover</a>
-        </div>
-    </nav>
 
-    <div class="hero">
-        <h1>AI Tools for Creators</h1>
-        <p class="subtitle">Supercharge your content creation with our free tools.</p>
-        
-        <div class="grid-container">
-            <a href="youtube-title-gen.html" class="tool-card">
-                <span class="icon">🎥</span>
-                <div class="tool-title">YouTube Title Gen</div>
-                <div class="tool-desc">Create viral & clickbait titles optimized for high CTR.</div>
-            </a>
-
-          <a href="caption-gen.html" class="tool-card">
-    <span class="icon">💬</span>
-    <div class="tool-title">Caption Gen</div>
-    <div class="tool-desc">For best results, use a Noun (Naming word).</div>
-         </a>
-
-          <a href="fancy-font-gen.html" class="tool-card">
-    <span class="icon">🔠</span>
-    <div class="tool-title">Fancy Fonts</div>
-    <div class="tool-desc">Generate cool stylish text & symbols for Instagram Bio and Games.</div>
-</a>
-
-          <a href="quote-maker.html" class="tool-card">
-    <span class="icon">🎨</span>
-    <div class="tool-title">Quote Maker</div>
-    <div class="tool-desc">Create beautiful quotes with custom fonts & backgrounds.</div>
-</a>  
-
-                   <a href="bg-remover.html" class="tool-card">
-    <span class="icon">✨</span>
-    <div class="tool-title">BG Remover</div>
-    <div class="tool-desc">Background Remover (AI)</div>
-</a>
-
-             <a href="Neo-Dodge.html" class="tool-card">
-    <span class="icon">✨</span>
-    <div class="tool-title">Neo-Dodge</div>
-    <div class="tool-desc">Neo-Dodge Game (AI)</div>
-</a>
-        </div>
+<div id="ui-layer">
+    <h1 id="scoreDisplay">0</h1>
+    <p>กดซ้าย/ขวา หรือแตะจอเพื่อบังคับยาน!</p>
+    <div id="gameOverMsg" style="display:none;">
+        <h2 style="color: #ff1744; margin-top: 0;">ภารกิจล้มเหลว!</h2>
+        <p style="font-size: 20px;">คะแนนสูงสุด: <span id="finalScore"></span></p>
+        <button id="startBtn" onclick="startGame()">เริ่มใหม่</button>
     </div>
+</div>
 
-    <footer>
-        &copy; 2026 EzGenTools.com | Powered by Jimi & Husband ❤️
-    </footer>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const gameOverMsg = document.getElementById('gameOverMsg');
+    const finalScore = document.getElementById('finalScore');
+
+    // --- โหลดรูปภาพ ---
+    const playerImg = new Image();
+    playerImg.src = 'image_14.png'; // รูปยานอวกาศ
+
+    const enemyImg = new Image();
+    enemyImg.src = 'image_13.png'; // รูปอุกกาบาต
+
+    let imagesLoaded = 0;
+    function onImageLoad() {
+        imagesLoaded++;
+        // เริ่มเกมเมื่อโหลดรูปครบทั้ง 2 รูป
+        if (imagesLoaded === 2) {
+            startGame();
+        }
+    }
+    playerImg.onload = onImageLoad;
+    enemyImg.onload = onImageLoad;
+
+
+    // ตั้งค่าขนาดจอ
+    function resize() {
+        canvas.width = window.innerWidth > 500 ? 480 : window.innerWidth - 20;
+        canvas.height = window.innerHeight > 850 ? 700 : window.innerHeight - 20;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ตัวแปรเกม
+    let player, enemies, score, gameRunning, frameCount;
+    let speedMultiplier = 1;
+
+    // ระบบควบคุม
+    let keys = {};
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+    
+    let touchX = null;
+    canvas.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+    canvas.addEventListener('touchmove', e => {
+        e.preventDefault();
+        touchX = e.touches[0].clientX;
+    });
+    canvas.addEventListener('touchend', () => touchX = null);
+
+    function startGame() {
+        // ปรับขนาดยานให้เหมาะสม (กว้างกว่าสูงนิดหน่อย)
+        player = { x: canvas.width/2 - 30, y: canvas.height - 80, w: 60, h: 50, speed: 6 };
+        enemies = [];
+        score = 0;
+        frameCount = 0;
+        speedMultiplier = 1;
+        gameRunning = true;
+        gameOverMsg.style.display = 'none';
+        scoreDisplay.innerText = "0";
+        loop();
+    }
+
+    function loop() {
+        if (!gameRunning) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. อัปเดตผู้เล่น
+        if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+        if (keys['ArrowRight'] && player.x < canvas.width - player.w) player.x += player.speed;
+        
+        if (touchX !== null) {
+            const rect = canvas.getBoundingClientRect();
+            const relativeX = touchX - rect.left;
+            if (relativeX < player.x + player.w/2 - 5) player.x -= player.speed;
+            if (relativeX > player.x + player.w/2 + 5) player.x += player.speed;
+        }
+
+        // --- วาดผู้เล่น (ใช้รูปภาพแทนสี่เหลี่ยม) ---
+        // ใช้ ctx.drawImage(รูป, x, y, กว้าง, สูง)
+        ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
+
+
+        // 2. สร้างศัตรู (อุกกาบาต)
+        frameCount++;
+        // สร้างถี่ขึ้นเล็กน้อย (ทุก 35 เฟรม)
+        if (frameCount % 35 === 0) { 
+            // สุ่มขนาดอุกกาบาตให้หลากหลายขึ้น
+            const size = Math.random() * 40 + 30; 
+            enemies.push({
+                x: Math.random() * (canvas.width - size),
+                y: -size,
+                w: size,
+                h: size, // ให้อุกกาบาตเป็นสี่เหลี่ยมจัตุรัส
+                speed: Math.random() * 3 + 2 + speedMultiplier
+            });
+        }
+
+        // เพิ่มความยากเร็วขึ้นนิดนึง
+        if (frameCount % 400 === 0) speedMultiplier += 0.3;
+
+        // 3. อัปเดตศัตรู
+        enemies.forEach((enemy, index) => {
+            enemy.y += enemy.speed;
+            
+            // --- วาดศัตรู (ใช้รูปภาพแทนสี่เหลี่ยม) ---
+            ctx.drawImage(enemyImg, enemy.x, enemy.y, enemy.w, enemy.h);
+
+            // เช็คชน (Collision Detection - แบบสี่เหลี่ยมเหมือนเดิม)
+            // (อาจจะไม่แม่นเป๊ะกับรูปทรง แต่ใช้ได้ดีสำหรับเกมง่ายๆ)
+            if (
+                player.x < enemy.x + enemy.w - 5 && // ลดขอบเขตการชนนิดหน่อยให้หลบง่ายขึ้น
+                player.x + player.w > enemy.x + 5 &&
+                player.y < enemy.y + enemy.h - 5 &&
+                player.h + player.y > enemy.y + 5
+            ) {
+                gameOver();
+            }
+
+            if (enemy.y > canvas.height) {
+                enemies.splice(index, 1);
+                score += 10;
+                scoreDisplay.innerText = score;
+            }
+        });
+
+        requestAnimationFrame(loop);
+    }
+
+    function gameOver() {
+        gameRunning = false;
+        finalScore.innerText = score; // แสดงคะแนนสุดท้าย
+        gameOverMsg.style.display = 'block';
+    }
+
+    // ไม่ต้องเรียก startGame() ตรงนี้แล้ว เพราะจะเรียกเมื่อโหลดรูปเสร็จใน onImageLoad()
+
+</script>
 
 </body>
 </html>
