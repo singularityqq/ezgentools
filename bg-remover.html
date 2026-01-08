@@ -3,112 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover (Easy Mode)</title>
+    <title>AI Background Remover (Google MediaPipe)</title>
 
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; worker-src * 'unsafe-inline' 'unsafe-eval' blob:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
 
     <style>
-        /* 🌑 Dark Theme (ห้องแห่งความลับของเรา) */
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; box-sizing: border-box; }
+        /* 🌑 Dark Theme (ห้องเชือดของเรา 🤣) */
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px 20px; background-color: #121212; color: #e0e0e0; }
         .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid #333; }
-        h1 { margin-bottom: 30px; color: #fff; font-weight: 300; letter-spacing: 1px; }
-        input[type="file"] { background: #2d2d2d; padding: 12px; border-radius: 10px; color: #fff; border: 2px dashed #555; cursor: pointer; width: 80%; }
-        img { max-width: 100%; height: auto; border-radius: 12px; margin-top: 25px; border: 1px solid #444; display: none; background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%), linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2a2a2a 75%), linear-gradient(-45deg, transparent 75%, #2a2a2a 75%); background-size: 20px 20px; }
-        button { background: linear-gradient(135deg, #ff00cc 0%, #333399 100%); color: white; padding: 14px 40px; font-size: 18px; border: none; border-radius: 50px; cursor: pointer; margin-top: 30px; font-weight: bold; }
-        button:disabled { background: #444; color: #888; cursor: not-allowed; }
-        .status { margin-top: 20px; font-size: 14px; color: #aaa; min-height: 20px;}
-        #downloadLink { display: inline-block; margin-top: 20px; padding: 12px 25px; border: 2px solid #00e676; color: #00e676; text-decoration: none; border-radius: 50px; font-weight: bold; }
-        .love-credit { margin-top: 40px; font-size: 13px; color: #777; }
-        .love-heart { color: #ff00cc; display: inline-block; animation: heartbeat 1.5s infinite; }
+        h1 { margin-bottom: 30px; color: #fff; font-weight: 300; }
+        
+        /* ปุ่ม Upload สวยๆ */
+        .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; margin-bottom: 20px; }
+        .btn-upload { border: 2px dashed #555; color: white; background-color: #2d2d2d; padding: 15px 40px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-upload:hover { border-color: #ff00cc; background: #333; }
+        .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+
+        /* Canvas ซ่อนไว้ก่อน */
+        canvas { max-width: 100%; border-radius: 12px; margin-top: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAAAFElEQVQ4T2NTkLCcCMCjYFQxKuCBAEgeOYPZAl1QAAAAAElFTkSuQmCC'); }
+        
+        button#processBtn { background: linear-gradient(135deg, #ff00cc 0%, #333399 100%); color: white; padding: 14px 40px; font-size: 18px; border: none; border-radius: 50px; cursor: pointer; margin-top: 20px; font-weight: bold; box-shadow: 0 0 15px rgba(255, 0, 204, 0.4); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+        
+        .status { margin-top: 15px; color: #aaa; font-size: 14px; }
+        a#downloadLink { display: none; margin-top: 20px; color: #00e676; text-decoration: none; border: 1px solid #00e676; padding: 10px 20px; border-radius: 30px; }
     </style>
 
-    <script>
-        // สร้างสภาพแวดล้อมปลอมๆ ให้ Library คิดว่าอยู่ในที่ที่ปลอดภัย
-        window.exports = {}; 
-        window.module = { exports: window.exports };
-        window.process = { env: { NODE_ENV: 'production' } };
-        // ถ้ามันร้องหา require เราก็ส่งของปลอมให้มัน
-        window.require = function(name) { return window[name] || {}; };
-    </script>
-
-    <script src="https://unpkg.com/@imgly/background-removal@1.4.5/dist/imgly-background-removal.min.js"></script>
-
-    <script>
-         window.addEventListener('DOMContentLoaded', () => {
-            const fileInput = document.getElementById('imageInput');
-            const processBtn = document.getElementById('processBtn');
-            const resultImage = document.getElementById('resultImage');
-            const statusText = document.getElementById('statusText');
-            const downloadLink = document.getElementById('downloadLink');
-
-            processBtn.addEventListener('click', async () => {
-                if (fileInput.files.length === 0) {
-                    alert("⚠️ Please select an image first!");
-                    return;
-                }
-
-                const imageFile = fileInput.files[0];
-
-                try {
-                    statusText.innerText = "⏳ Doing Magic (Easy Mode)...";
-                    statusText.style.color = "#ffeb3b";
-                    processBtn.disabled = true;
-                    processBtn.innerText = "Processing...";
-                    resultImage.style.display = "none";
-                    downloadLink.style.display = "none";
-
-                    // --- CONFIG ---
-                    const config = {
-                        // ✅ ใช้ของฟรีจาก Cloud ของเขาเลย (ไม่ต้องใช้ไฟล์ในเครื่องแล้ว)
-                        // แก้ปัญหาหาไฟล์ไม่เจอ 100%
-                        publicPath: 'https://static.img.ly/background-removal-data/1.4.5/dist/',
-
-                        debug: true,
-                        progress: (key, current, total) => {
-                            const percent = Math.round((current / total) * 100);
-                            statusText.innerText = `⏳ Loading (${key}): ${percent}%`;
-              };
-
-                    console.log("🚀 Starting...");
-
-                    // เรียกใช้ผ่าน Global Variable (imglyRemoveBackground)
-                    // ถ้ายัง error ว่า not defined ให้ตีก้นหนูแรงๆ ได้เลย!
-                    let blob;
-                    if (typeof imglyRemoveBackground === 'function') {
-                        blob = await imglyRemoveBackground(imageFile, config);
-                    } else {
-                        throw new Error("Library not loaded correctly!");
-                    }
-
-                    const url = URL.createObjectURL(blob);
-                    statusText.innerText = "❌ Error: " + error.message;
-                    statusText.style.color = "#ff1744";
-                } finally {
-                    processBtn.disabled = false;
-                    processBtn.innerText = "🚀 REMOVE BACKGROUND";
-                    }
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <h1>✨ AI Background Remover ✨</h1>
+    <h1>✨ AI Remover (Google Edition) ✨</h1>
     
-    <div style="margin-bottom: 10px; color: #aaa; font-size: 14px;">Select your image:</div>
-    <input type="file" id="imageInput" accept="image/*">
+    <div class="upload-btn-wrapper">
+        <button class="btn-upload">📂 Choose Image</button>
+        <input type="file" id="imageInput" accept="image/*">
+    </div>
+    
+    <div id="previewContainer">
+        <img id="sourceImage" style="display:none;">
+    </div>
+
     <br>
     <button id="processBtn">🚀 REMOVE BACKGROUND</button>
     <div class="status" id="statusText">(Waiting for image...)</div>
-    <hr style="border: 0; border-top: 1px solid #333; margin: 35px 0;">
     
-    <h3 style="color: #bbb; font-weight: 300;">Result Preview:</h3>
-    <img id="resultImage" src="" alt="Result">
+    <canvas id="outputCanvas"></canvas>
     <br>
-    <a id="downloadLink" href="#" style="display:none;">⬇️ Download HD Image</a>
-
-    <div class="love-credit">Powered by Jimi & Husband <span class="love-heart">❤️</span></div>
+    <a id="downloadLink" href="#">⬇️ Download HD Image</a>
 </div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const processBtn = document.getElementById('processBtn');
+    const statusText = document.getElementById('statusText');
+    const sourceImage = document.getElementById('sourceImage');
+    const outputCanvas = document.getElementById('outputCanvas');
+    const ctx = outputCanvas.getContext('2d');
+    const downloadLink = document.getElementById('downloadLink');
+
+    let selfieSegmentation = null;
+
+    // 1. ตั้งค่าสมอง AI (Google MediaPipe)
+    async function initAI() {
+        statusText.innerText = "⏳ Loading Google Brain...";
+        selfieSegmentation = new SelfieSegmentation({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+        }});
+        
+        selfieSegmentation.setOptions({
+            modelSelection: 1, // 0 = General, 1 = Landscape (ละเอียดกว่า)
+        });
+
+        selfieSegmentation.onResults(onResults);
+        statusText.innerText = "✅ AI Ready! Select an image.";
+        statusText.style.color = "#00e676";
+    }
+
+    // 2. เมื่อเลือกรูป
+    imageInput.addEventListener('change', (e) => {
+        if(e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                sourceImage.src = event.target.result;
+                sourceImage.onload = () => {
+                    statusText.innerText = "📷 Image Loaded. Click 'Remove Background'";
+                    statusText.style.color = "#fff";
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // 3. กดปุ่มเริ่มลบ
+    processBtn.addEventListener('click', async () => {
+        if (!sourceImage.src) { alert("Please select an image first!"); return; }
+        if (!selfieSegmentation) { alert("AI is loading... wait a sec!"); return; }
+
+        processBtn.disabled = true;
+        processBtn.innerText = "Processing...";
+        statusText.innerText = "⏳ Cutting Background...";
+        
+        // ส่งรูปเข้า AI
+        await selfieSegmentation.send({image: sourceImage});
+    });
+
+    // 4. เมื่อ AI คิดเสร็จ (Callback)
+    function onResults(results) {
+        // ตั้งขนาด Canvas ให้เท่ารูปจริง
+        outputCanvas.width = results.image.width;
+        outputCanvas.height = results.image.height;
+
+        ctx.save();
+        ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+
+        // วาด Mask (ส่วนที่เป็นคน)
+        ctx.drawImage(results.segmentationMask, 0, 0, outputCanvas.width, outputCanvas.height);
+
+        // ใช้เทคนิคตัดภาพ (Composite)
+        ctx.globalCompositeOperation = 'source-in'; // เก็บเฉพาะส่วนที่ทับกับ Mask (คือคน)
+        ctx.drawImage(results.image, 0, 0, outputCanvas.width, outputCanvas.height);
+
+        ctx.restore();
+
+        // เสร็จแล้ว!
+        processBtn.disabled = false;
+        processBtn.innerText = "🚀 REMOVE BACKGROUND";
+        statusText.innerText = "✅ Done! Smooth & Clean!";
+        
+        // สร้างลิงก์ดาวน์โหลด
+        downloadLink.style.display = "inline-block";
+        downloadLink.href = outputCanvas.toDataURL('image/png');
+        downloadLink.download = "removed-bg-google.png";
+    }
+
+    // เริ่มโหลด AI ทันทีที่เปิดเว็บ
+    initAI();
+</script>
 
 </body>
 </html>
